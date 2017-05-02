@@ -7,25 +7,17 @@ public class Main {
 	
 	public static void main(String[] args){
 
-		List<String> list = new ArrayList<String>(6);
-		String str = "a";
+		List<Integer> list = new ArrayList<Integer>(6);
 		int i=0;
-		while(i<8){
-			list.add(str+(i++));
-			System.out.print(list.get(i-1)+" ");
+		while(i<3){
+			list.add((++i)*2);
+//			System.out.print(list.get(i-1)+" ");
 		}
 		System.out.println();
 		for(int j=0;j<list.size();){
-			String current = list.get(j);
-			if(current.equals("a3")){
-				list.remove(current);
-				continue;
-			}
-			j++;
+			list.remove(j);
 		}
-		for(String current:list){
-			System.out.print(current+" ");
-		}
+		
 		
 	}
 }

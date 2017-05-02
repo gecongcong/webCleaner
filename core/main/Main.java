@@ -22,11 +22,11 @@ public class Main {
 		
 		Rule rule = new Rule();
 		String currentDIR = System.getProperty("user.dir");//获得当前工程路径
-		String rulesFile = currentDIR + "\\rules.txt";
-		String evidence_outFile = currentDIR + "\\evidence.db";
+		String rulesFile = currentDIR + "\\dataSet\\test\\rules.txt";
+		String evidence_outFile = currentDIR + "\\dataSet\\test\\evidence.db";
 //		String dataURL = currentDIR + "\\dataSet\\"+ "car evaluation-new\\car.data";
-//		String dataURL = currentDIR + "\\dataSet\\"+ "test-city.data";
-		String dataURL = currentDIR + "\\dataSet\\"+ "HAI-10.csv";
+		String dataURL = currentDIR + "\\dataSet\\"+ "test\\test-city.data";
+//		String dataURL = currentDIR + "\\dataSet\\"+ "HAI-5q.csv";
 		
 		String splitString = ",";
 		boolean ifHeader = true;
@@ -52,25 +52,25 @@ public class Main {
 		String mln_args = "-i";
 		list.add(mln_args);
 		
-		String mlnFileURL = "prog.mln";//prog.mln
+		String mlnFileURL = "dataSet\\test\\prog.mln";//prog.mln
 		list.add(mlnFileURL);
 		
 		String evidence_args = "-e";
 		list.add(evidence_args);
 		
-		String evidenceFileURL = "evidence.db"; //samples/smoke/
+		String evidenceFileURL = "dataSet\\test\\evidence.db"; //samples/smoke/
 		list.add(evidenceFileURL);
 		
 		String queryFile_args = "-queryFile";
 		list.add(queryFile_args);
 		
-		String queryFileURL = "query.db";
+		String queryFileURL = "dataSet\\test\\query.db";
 		list.add(queryFileURL);
 		
 		String outFile_args = "-r";
 		list.add(outFile_args);
 		
-		String weightFileURL = "out.txt";
+		String weightFileURL = "dataSet\\test\\out.txt";
 		list.add(weightFileURL);
 		
 		String noDropDB = "-keepData";
@@ -79,7 +79,7 @@ public class Main {
 		String maxIter_args = "-dMaxIter";
 		list.add(maxIter_args);
 		
-		String maxIter = "100";
+		String maxIter = "200";
 		list.add(maxIter);
 
 		
@@ -107,7 +107,7 @@ public class Main {
         domain.correctByMLN(domain.Domain_to_Groups, attributesPROB, domain.header, domain.domains);
         
         //打印修正后的Domain
-//        domain.printDomainContent(domain.domains);
+        domain.printDomainContent(domain.domains);
         
         System.out.println(">>> Find Duplicate Values...");
         

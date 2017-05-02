@@ -279,11 +279,11 @@ public class Domain {
 			}
 		}
 		int d_index=0;
-//		for(List<HashMap<Integer, Tuple>> d: Domain_to_Groups){
-//			System.out.println("\n*******Domain "+(++d_index)+"*******");
-//			printGroup(d);
-//		}
-		//printGroup(groups);
+		for(List<HashMap<Integer, Tuple>> d: Domain_to_Groups){
+			System.out.println("\n*******Domain "+(++d_index)+"*******");
+			printGroup(d);
+		}
+//		printGroup(groups);
 	}
 	
 	/**
@@ -333,11 +333,11 @@ public class Domain {
 		
 		//输出修正后的Group结果
 		System.out.println("\n=======After Correct Values By MLN Probability=======");
-//		int d_index = 0;
-//		for(List<HashMap<Integer, Tuple>> groups: Domain_to_Groups){
-//			System.out.println("\n*******Domain "+(++d_index)+"*******");
-//			printGroup(groups);
-//		}
+		int d_index = 0;
+		for(List<HashMap<Integer, Tuple>> groups: Domain_to_Groups){
+			System.out.println("\n*******Domain "+(++d_index)+"*******");
+			printGroup(groups);
+		}
 	}
 	
 	
@@ -510,9 +510,16 @@ public class Domain {
 				newGroup.put(key, combineTuple(t1, t2, sameID));
 				ki++;
 			}else{
+				System.out.println("Conflict:");
+				System.out.println("\tcontext1 = "+Arrays.toString(group1.get(key).TupleContext));
+				System.out.println("\tcontext2 = "+Arrays.toString(group2.get(key).TupleContext));
 				group1.remove(key);
 				group2.remove(key);
-				keyList.remove(key);
+				System.out.println("\tKEY = "+key+" ki = "+ki);
+//				for(int m = 0;m<keyList.size();m++){
+//					System.out.println(keyList.get(m));
+//				}
+				keyList.remove(ki);
 				
 				//根据DomainID将冲突的Tuple记录下来
 				ct1.setConflictIDs(sameID);
@@ -724,7 +731,7 @@ public class Domain {
 			int cur_groups_index = 0;
 			int cur_groups_size = cur_groups.size();
 			
-			boolean[] flags = new boolean[cur_groups_size];
+//			boolean[] flags = new boolean[pre_groups_size];
 			
 			while(pre_groups_index < pre_groups_size && cur_groups_index < cur_groups_size){
 //				if(flags[cur_groups_index]){
@@ -741,27 +748,23 @@ public class Domain {
 					pre_group = combineGroup(keyList, pre_group, cur_group, preDomainID, curDomainID);
 					
 					if(null==pre_group){
-//						flags[cur_groups_index]=true;
 						keysList.remove(pre_groups_index);
-						pre_groups_index++;
 						continue;
 					}
 					keysList.set(pre_groups_index, keyList);
 					pre_groups_index++;
-//					flags[cur_groups_index]=true;
+//					flags[pre_groups_index]=true;
 					continue;
 					
 				}
-				if(cur_groups_index == (cur_groups_size-1)){
+				cur_groups_index++;
+				if(cur_groups_index == cur_groups_size){
+//					flags[pre_groups_index]=true;
 					cur_groups_index=0;
-				}else{
-					cur_groups_index++;
+					pre_groups_index++;
 				}
 			}
 			preDomainID = i;
-//			for(int k=0;k<flags.length;k++){
-//				if(!flags[k]) keysList.remove(k);
-//			}
 		}
 		
 		//===========test==========

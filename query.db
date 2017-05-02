@@ -1,10 +1,10 @@
-//zipcode(valuezipcode)
-//city(valuecity)
-//state(valuestate)
+zipcode(valuezipcode)
+city(valuecity)
+state(valuestate)
 
 
-ProviderID(valueProviderID)
-City(valueCity)
-State(valueState)
-ZIPCode(valueZIPCode)
-PhoneNumber(valuePhoneNumber)
+//ProviderID(valueProviderID)
+//City(valueCity)
+//State(valueState)
+//ZIPCode(valueZIPCode)
+//PhoneNumber(valuePhoneNumber)
