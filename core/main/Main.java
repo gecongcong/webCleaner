@@ -21,11 +21,12 @@ public class Main {
 		double startTime = System.currentTimeMillis();    //获取开始时间
 		
 		Rule rule = new Rule();
-		String currentDIR = System.getProperty("user.dir");//获得当前工程路径
-		String rulesFile = currentDIR + "\\dataSet\\test\\rules.txt";
-		String evidence_outFile = currentDIR + "\\dataSet\\test\\evidence.db";
+		String currentDIR = "E:\\eclipse-jee-neon-2-64\\eclipse-jee-neon-2-64\\eclipse\\UploadFiles";
+//		String currentDIR = System.getProperty("user.dir");//获得当前工程路径
+		String rulesFile = currentDIR + "\\rules.txt";
+		String evidence_outFile = currentDIR + "\\evidence.db";
 //		String dataURL = currentDIR + "\\dataSet\\"+ "car evaluation-new\\car.data";
-		String dataURL = currentDIR + "\\dataSet\\"+ "test\\test-city.data";
+		String dataURL = currentDIR + "\\test-city.data";
 //		String dataURL = currentDIR + "\\dataSet\\"+ "HAI-5q.csv";
 		
 		String splitString = ",";

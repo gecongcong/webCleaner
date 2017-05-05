@@ -14,6 +14,13 @@
     
 </head>
 <body style="font-family: 'Roboto';">
+<%
+	boolean cleanResult = false;
+	if(request.getAttribute( "cleanResult")!=null){
+		cleanResult = (boolean)request.getAttribute( "cleanResult");
+	}
+%>
+<input type="text" id="cleanResult" style="display:none" value="<%=cleanResult%>"/>
 <nav class="navbar navbar-default" role="navigation">
 	<div class="container-fluid">
 		<div class="navbar-header">
@@ -70,9 +77,9 @@
                     <div class="row">
                         <div class="col-sm-6 col-sm-offset-3 form-box">
                         	
-                        	<form role="form" action="" method="post" class="registration-form" style="font-weight: 300;">
+                        	<form action="DataCleanServlet" id="uploadForm" role="form" method="post" enctype="multipart/form-data" class="registration-form" style="font-weight: 300;">
                         		
-                        		<fieldset>
+                        		<fieldset id="fieldset">
 		                        	<div class="form-top">
 		                        		<div class="form-top-left">
 		                        			<h3>Step 1 / 3</h3>
@@ -83,12 +90,12 @@
 		                        		</div>
 		                            </div>
 		                            <div class="form-bottom">
-				                    	<div class="form-group">
+				                    	<div class="form-group" id="loadFileForm">
 				                    		<p>Dirty dataSet</p>
-				                    		<input id="file-0" class="file" type="file" name="dataset">
+				                    		<input id="file-dataset" class="file" type="file" name="dataset">
 				                    		<br>
 				                    		<p>Rules</p>
-				                    		<input id="file-0" class="file" type="file" name="rules">
+				                    		<input id="file-rules" class="file" type="file" name="rules">
 				                    		<br>
 				                    		<button type="button" class="btn btn-primary next">Next</button>
 				                    	</div>
@@ -100,28 +107,14 @@
 		                        	<div class="form-top">
 		                        		<div class="form-top-left">
 		                        			<h3>Step 2 / 3</h3>
-		                            		<p>Set up your account:</p>
+		                            		<p>Start Cleaning...</p>
 		                        		</div>
 		                        		<div class="form-top-right">
 		                        			<i class="fa fa-key"></i>
 		                        		</div>
 		                            </div>
 		                            <div class="form-bottom">
-				                        <div class="form-group">
-				                        	<label class="sr-only" for="form-email">Email</label>
-				                        	<input type="text" name="form-email" placeholder="Email..." class="form-email form-control" id="form-email">
-				                        </div>
-				                        <div class="form-group">
-				                    		<label class="sr-only" for="form-password">Password</label>
-				                        	<input type="password" name="form-password" placeholder="Password..." class="form-password form-control" id="form-password">
-				                        </div>
-				                        <div class="form-group">
-				                        	<label class="sr-only" for="form-repeat-password">Repeat password</label>
-				                        	<input type="password" name="form-repeat-password" placeholder="Repeat password..." 
-				                        				class="form-repeat-password form-control" id="form-repeat-password">
-				                        </div>
-				                        <button type="button" class="btn btn-primary previous">Previous</button>
-				                        <button type="button" class="btn btn-primary next">Next</button>
+		                            	<div id="messages"></div>
 				                    </div>
 			                    </fieldset>
 			                    
@@ -129,30 +122,17 @@
 		                        	<div class="form-top">
 		                        		<div class="form-top-left">
 		                        			<h3>Step 3 / 3</h3>
-		                            		<p>Social media profiles:</p>
+		                            		<p>Cleaning finished!</p>
 		                        		</div>
 		                        		<div class="form-top-right">
-		                        			<i class="fa fa-twitter"></i>
+		                        			<i class="fa fa-key"></i>
 		                        		</div>
 		                            </div>
 		                            <div class="form-bottom">
-				                    	<div class="form-group">
-				                    		<label class="sr-only" for="form-facebook">Facebook</label>
-				                        	<input type="text" name="form-facebook" placeholder="Facebook..." class="form-facebook form-control" id="form-facebook">
-				                        </div>
-				                        <div class="form-group">
-				                        	<label class="sr-only" for="form-twitter">Twitter</label>
-				                        	<input type="text" name="form-twitter" placeholder="Twitter..." class="form-twitter form-control" id="form-twitter">
-				                        </div>
-				                        <div class="form-group">
-				                        	<label class="sr-only" for="form-google-plus">Google plus</label>
-				                        	<input type="text" name="form-google-plus" placeholder="Google plus..." class="form-google-plus form-control" id="form-google-plus">
-				                        </div>
 				                        <button type="button" class="btn btn-primary previous">Previous</button>
 				                        <button type="button" class="btn btn-success submit">Sign me up!</button>
 				                    </div>
 			                    </fieldset>
-		                    
 		                    </form>
 		                    
                         </div>
@@ -171,11 +151,16 @@
 		<script src="bootstrap-fileinput-master/js/locales/zh.js"></script>
         
         <script>
-        $("#file-0").fileinput({
+        $("#file-dataset").fileinput({
+	        'allowedFileExtensions' : ['db','data', 'csv','txt'],
+	        uploadUrl: uploadUrl, //上传的地址
+	        maxFilesNum: 1,
+	    });
+        $("#file-rules").fileinput({
 	        'allowedFileExtensions' : ['db','data', 'csv','txt'],
 	        maxFilesNum: 1,
 	    });
-	    $("#file-1").fileinput({
+	    /* $("#file-rules").fileinput({
 	        uploadUrl: '#', // you must set a valid URL here else you will get an error
 	        allowedFileExtensions : ['jpeg', 'jpg', 'png','gif'],
 	        overwriteInitial: false,
@@ -185,7 +170,7 @@
 	        slugCallback: function(filename) {
 	            return filename.replace('(', '_').replace(']', '_');
 	        }
-		});
+		}); */
 		
 	    $(document).ready(function() {
 	        $("#test-upload").fileinput({
@@ -201,6 +186,38 @@
 	    });
         </script>
 
+		<!-- websocket发送消息 -->
+		<script type="text/javascript">
+	    var webSocket = new WebSocket('ws://localhost/Cleaner-web/DataCleanServlet');
+	    webSocket.onerror = function(event) {
+	      onError(event)
+	    };
+	 
+	    webSocket.onopen = function(event) {
+	      onOpen(event)
+	    };
+	 
+	    webSocket.onmessage = function(event) {
+	      onMessage(event)
+	    };
+	 
+	    function onMessage(event) {
+	      document.getElementById('messages').innerHTML += '<br />' + event.data;
+	    }
+	 
+	    function onOpen(event) {
+	      document.getElementById('messages').innerHTML = 'Connection established';
+	    }
+	 
+	    function onError(event) {
+	      alert(event.data);
+	    }
+	 
+	    function start() {
+	      webSocket.send('hello');
+	      return false;
+	    }
+	  	</script>
 
 </div>
 </body>

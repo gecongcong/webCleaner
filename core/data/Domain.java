@@ -348,6 +348,10 @@ public class Domain {
 	 * */
 	public void deleteDuplicate(List<List<Integer>> keyList_list, HashMap<Integer,String[]> dataSet){
 		for(List<Integer> keyList: keyList_list){
+			if(keyList==null){
+//				System.out.println("null");
+				continue;
+			}
 			for(int i=0;i<keyList.size()-1;i++){
 				int key = keyList.get(i);
 				dataSet.remove(key);
@@ -642,9 +646,13 @@ public class Domain {
 						List<HashMap<Integer, Tuple>> cur_groups = Domain_to_Groups.get(i);
 						for(HashMap<Integer, Tuple> group: cur_groups){
 							Iterator<Entry<Integer, Tuple>> iter = group.entrySet().iterator();
+							
+							int test_i = 0;
+							
 							while(iter.hasNext()){
 								Entry<Integer, Tuple> en = iter.next();
 								Tuple t = en.getValue();
+								System.out.println("for number = "+(test_i++));
 								if(ifContains(sameID, t.AttributeIndex) && ifSameValue(sameID, t, ct)){
 									flag[i] = true;
 									combinedTuple = combineTuple(combinedTuple, t, sameID);
@@ -731,15 +739,14 @@ public class Domain {
 			int cur_groups_index = 0;
 			int cur_groups_size = cur_groups.size();
 			
-//			boolean[] flags = new boolean[pre_groups_size];
-			
 			while(pre_groups_index < pre_groups_size && cur_groups_index < cur_groups_size){
-//				if(flags[cur_groups_index]){
-//					cur_groups_index++;
-//					continue;
-//				}
+
 				HashMap<Integer, Tuple> cur_group = cur_groups.get(cur_groups_index);
 				HashMap<Integer, Tuple> pre_group = pre_groups.get(pre_groups_index);
+
+				if(pre_groups_index==138){
+					System.err.println("xxxx:::"+pre_groups_index);
+				}
 				
 				//求两个group的交集
 				List<Integer> keyList = interset(calculateKeys(pre_group) , calculateKeys(cur_group));
@@ -748,18 +755,20 @@ public class Domain {
 					pre_group = combineGroup(keyList, pre_group, cur_group, preDomainID, curDomainID);
 					
 					if(null==pre_group){
-						keysList.remove(pre_groups_index);
+						System.out.println("xxxx::"+pre_groups_index);
+						keysList.set(pre_groups_index, null);
+						pre_groups_index++;
+//						keysList.remove(pre_groups_index);
 						continue;
 					}
-					keysList.set(pre_groups_index, keyList);
+					if(keysList.get(pre_groups_index)!=null){
+						keysList.set(pre_groups_index, keyList);
+					}
 					pre_groups_index++;
-//					flags[pre_groups_index]=true;
 					continue;
-					
 				}
 				cur_groups_index++;
 				if(cur_groups_index == cur_groups_size){
-//					flags[pre_groups_index]=true;
 					cur_groups_index=0;
 					pre_groups_index++;
 				}
