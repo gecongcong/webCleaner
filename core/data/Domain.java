@@ -118,15 +118,6 @@ public class Domain {
 	        		String[] tuple = str.split(splitString);
 	        		
 	        		dataSet.put(key, tuple);
-	        		
-//	        		if(!flag){
-//	        			length = tuple.length;
-//			        	header = new String[length];
-//			        	for(int i=1;i<=length;i++){
-//			        		header[i-1]="Attr"+i;
-//			        	}
-//			        	flag = true;
-//	        		}
 		        	
 	        		for(int i=0;i<rules_size;i++){	//为每一条rule划分数据集区域Di
 		        		Tuple curr_rule = rules.get(i);
@@ -347,14 +338,22 @@ public class Domain {
 	 * @param HashMap<Integer,String[]> dataSet
 	 * */
 	public void deleteDuplicate(List<List<Integer>> keyList_list, HashMap<Integer,String[]> dataSet){
+		System.out.println("\tDuplicate keys: ");
 		for(List<Integer> keyList: keyList_list){
-			if(keyList==null){
-//				System.out.println("null");
-				continue;
-			}
+			if(keyList==null) continue;
 			for(int i=0;i<keyList.size()-1;i++){
-				int key = keyList.get(i);
-				dataSet.remove(key);
+				int key1 = keyList.get(i);
+				String[] pre_tuple = dataSet.get(key1);
+				System.out.print("\tGROUP "+i+":"+key1+" ");
+				for(int j=i+1;j<keyList.size();j++){
+					int key2 = keyList.get(j);
+					String[] curr_tuple = dataSet.get(key2);
+					if(Arrays.toString(pre_tuple).equals(Arrays.toString(curr_tuple))){
+						System.out.print(key2+" ");
+						dataSet.remove(key2);
+					}
+				}
+				System.out.println();
 			}
 		}
 	}
@@ -609,6 +608,7 @@ public class Domain {
 					break;
 				}else cti++;
 			}
+			if(cti==ct.AttributeIndex.length || ti==t.AttributeIndex.length)return false;
 			if(t.TupleContext[ti].equals(ct.TupleContext[cti]))count++;
 		}
 		if(count == i)result = true;

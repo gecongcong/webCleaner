@@ -1,13 +1,17 @@
 package servlet;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -34,7 +38,7 @@ public class DataCleanServlet extends HttpServlet {
 	private String rulesURL = null;
 	private String datasetURL = null;
 	private static final long serialVersionUID = 1L;
-	private String baseURL = "E:\\experiment\\";
+	private String baseURL = "D:\\experiment\\";
 	
     public DataCleanServlet() {super();}
 
@@ -75,11 +79,12 @@ public class DataCleanServlet extends HttpServlet {
 	}
 	
 	public void startClean(String rulesFile, String dataURL, HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException{
-		
+//		List<Integer> ignoredIDs = new ArrayList<Integer>();
 		double startTime = System.currentTimeMillis();    //获取开始时间
 		
 		Rule rule = new Rule();
-		String evidence_outFile = baseURL + "evidence.db";
+		String evidence_outFile = baseURL + "dataSet\\HAI\\evidence.db";
+		String cleanedFileURL = baseURL+ "cleanedDataSet.txt";//存放清洗后的数据集
 		
 		String splitString = ",";
 		boolean ifHeader = true;
@@ -90,6 +95,7 @@ public class DataCleanServlet extends HttpServlet {
 		
 		rule.formatEvidence(evidence_outFile);
 		
+//		ignoredIDs = rule.findIgnoredTuples(rules);
 		
 		//调用MLN相关的命令参数
 		ArrayList<String> list = new ArrayList<String>();
@@ -105,25 +111,25 @@ public class DataCleanServlet extends HttpServlet {
 		String mln_args = "-i";
 		list.add(mln_args);
 		
-		String mlnFileURL = baseURL+"dataSet\\test\\prog.mln";//prog.mln
+		String mlnFileURL = baseURL+"dataSet\\HAI\\prog.mln";//prog.mln
 		list.add(mlnFileURL);
 		
 		String evidence_args = "-e";
 		list.add(evidence_args);
 		
-		String evidenceFileURL = baseURL+"dataSet\\test\\evidence.db"; //samples/smoke/
+		String evidenceFileURL = baseURL+"dataSet\\HAI\\evidence.db"; //samples/smoke/
 		list.add(evidenceFileURL);
 		
 		String queryFile_args = "-queryFile";
 		list.add(queryFile_args);
 		
-		String queryFileURL = baseURL+"dataSet\\test\\query.db";
+		String queryFileURL = baseURL+"dataSet\\HAI\\query.db";
 		list.add(queryFileURL);
 		
 		String outFile_args = "-r";
 		list.add(outFile_args);
 		
-		String weightFileURL = baseURL+"dataSet\\test\\out.txt";
+		String weightFileURL = baseURL+"dataSet\\HAI\\out.txt";
 		list.add(weightFileURL);
 		
 		String noDropDB = "-keepData";
@@ -166,38 +172,22 @@ public class DataCleanServlet extends HttpServlet {
         
         List<List<Integer>> keysList = domain.combineDomain(domain.Domain_to_Groups); 	//返回所有重复数组的tupleID,并记录重复元组
         
+        //打印重复数据的Tuple ID
         System.out.println("\n\tDuplicate keys: ");
-        int c=0;
         if(null == keysList || keysList.isEmpty())System.out.println("\tNo duplicate exists.");
         else{
-        	for(List<Integer> keyList: keysList){
-	        	System.out.print("\tGroup "+(++c)+": ");
-	        	if(keyList==null){
-	        		System.out.println();
-	        		continue;
-	        	}
-	        	for(int key: keyList){
-	        		System.out.print(key+" ");
-	        	}
-	      		System.out.println();
-	      	}
           	System.out.println("\n>>> Delete duplicate tuples");
-          	
-          	//执行去重操作
-          	domain.deleteDuplicate(keysList, domain.dataSet);
-          	
+          	domain.deleteDuplicate(keysList, domain.dataSet);	//执行去重操作
           	System.out.println(">>> completed!");
         }
-	    
-      	//打印删除‘后’的数据集内容
 //      	domain.printDataSet(domain.dataSet);
       	
 //      	domain.printConflicts(domain.conflicts);
       	
       	domain.findCandidate(domain.conflicts, domain.Domain_to_Groups, domain.domains, attributesPROB);
-      	
-//      	domain.printDataSet(domain.dataSet);
-      	
+      	//print dataset after cleaning
+      	domain.printDataSet(domain.dataSet);
+      	writeToFile(cleanedFileURL,domain.dataSet, domain.header);
       	double endTime = System.currentTimeMillis();    //获取结束时间
       	
       	double totalTime= (endTime-startTime)/1000;
@@ -205,7 +195,47 @@ public class DataCleanServlet extends HttpServlet {
       	
       	System.out.println("程序运行时间： "+df.format(totalTime)+"s"); 
 	}
-
+	
+	//写文件
+	public void writeToFile(String cleanedFileURL, HashMap<Integer, String[]> dataSet, String[] header){
+		File file = new File(cleanedFileURL);
+		FileWriter fw = null;
+        BufferedWriter writer = null;
+        try {
+            fw = new FileWriter(file);
+            if (file.exists()) {// 判断文件是否存在
+    			System.out.println("文件已存在: " + cleanedFileURL);
+    		}
+            else if (!file.getParentFile().exists()) {// 判断目标文件所在的目录是否存在
+    			// 如果目标文件所在的文件夹不存在，则创建父文件夹
+    			System.out.println("目标文件所在目录不存在，准备创建它！");
+    			if (!file.getParentFile().mkdirs()) {// 判断创建目录是否成功
+    				System.out.println("创建目标文件所在的目录失败！");
+    			}
+    		}
+            else{
+            	file.createNewFile();
+            }
+            writer = new BufferedWriter(fw);
+            Iterator<Entry<Integer, String[]>> iter = dataSet.entrySet().iterator();
+            writer.write(Arrays.toString(header).replaceAll("[\\[\\]]",""));
+            writer.newLine();//换行
+            while(iter.hasNext()){
+            	Entry<Integer, String[]> entry = iter.next();
+            	String line = Arrays.toString(entry.getValue()).replaceAll("[\\[\\]]","");
+            	System.out.println(line);
+                writer.write(line);
+                writer.newLine();//换行
+            }
+            writer.flush();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }catch (IOException e) {
+            e.printStackTrace();
+        }finally{
+        	
+        }
+	}
 	
 	public void getFilesUrl(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
 		//获得磁盘文件条目工厂  
@@ -221,21 +251,7 @@ public class DataCleanServlet extends HttpServlet {
         try {  
             //可以上传多个文件  
         	List<FileItem> list = (List<FileItem>)upload.parseRequest(request);
-        	
-//        	for(FileItem item : list){  
-//            	//获取表单的属性名字  
-//            	String name = item.getFieldName();  
-//            	//如果获取的 表单信息是普通的 文本 信息  
-//                if(item.isFormField()){                     
-//                    //获取用户具体输入的字符串 ，因为表单提交过来的是 字符串类型的  
-//                    String value = item.getString();
-//                    System.out.println("item.name:"+name);
-//                    System.out.println("item.value:"+value);
-//                    path += value+"\\";
-//                    break;
-//                }  
-//            }
-        	
+
             for(FileItem item : list){  
             	//获取表单的属性名字  
             	String name = item.getFieldName();  

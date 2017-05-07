@@ -32,6 +32,36 @@ public class Rule {
 	public Rule(){}
 	
 	
+	public ArrayList<Integer> findIgnoredTuples(List<Tuple> rules){
+		ArrayList<Integer> ignoredIDs = new ArrayList<Integer>();
+		
+		HashMap<String,Integer> map = new HashMap<String,Integer>(header.length);
+		
+		for(Tuple rule: rules){
+			int i = 0;
+			while(i<rule.reason.length){
+				map.put(rule.reason[i++], 1);
+			}
+			int j=0;
+			while(j<rule.result.length){
+				map.put(rule.result[j++], 1);
+			}
+		}
+		for(int i=0;i<header.length;i++){
+			String predicate = header[i];
+			Integer result = map.get(predicate);
+			if(null == result){//find ignored tuple predicate
+				ignoredIDs.add(i);
+			}
+		}
+		System.out.print("Ignored Tuple ID:");
+		for(int i: ignoredIDs){
+			System.out.print(i+" ");
+		}
+		
+		return ignoredIDs;
+	}
+	
 	/**
 	 * 鏉╂柨娲栭崡鏇氶嚋鐏炵偞锟窖冩倳閻ㄥ嫭澧嶉崷銊ュ灙閻ㄥ嫮绱崣锟�
 	 * @return Attribute Index
@@ -460,7 +490,7 @@ public class Rule {
 	 * Init Data
 	 * */
 	public void initData(String fileURL,String splitString,boolean ifHeader){//check if the data has header
-		// read file content from file 鐠囪褰囬弬鍥︽閸愬懎顔�
+		// read file content from file
         FileReader reader;
 		try {
 			reader = new FileReader(fileURL);
