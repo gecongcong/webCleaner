@@ -8,7 +8,7 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 
-@ServerEndpoint("/DataCleanServlet")
+//@ServerEndpoint("/DataCleanServlet")
 public class CleanerSocketServer {
     @OnMessage
     public void onMessage(String message, Session session) throws IOException, InterruptedException {

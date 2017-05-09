@@ -22,6 +22,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.websocket.Session;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -32,15 +34,23 @@ import data.Domain;
 import data.Rule;
 import data.Tuple;
 import tuffy.main.MLNmain;
+import websocket.CleanerSocketServer;
+import websocket.WebSocketTest;
 
 @WebServlet("/DataCleanServlet")
 public class DataCleanServlet extends HttpServlet {
+	
+	public String[] header = null;
+	public WebSocketTest socket;
 	private String rulesURL = null;
 	private String datasetURL = null;
 	private static final long serialVersionUID = 1L;
-	private String baseURL = "D:\\experiment\\";
+	private String baseURL = "E:\\experiment\\";
 	
-    public DataCleanServlet() {super();}
+    public DataCleanServlet() {
+    	super();
+    	
+    }
 
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -48,6 +58,12 @@ public class DataCleanServlet extends HttpServlet {
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+//		WebSocketTest socket= new WebSocketTest();
+		socket = new WebSocketTest();
+		String message = "Begin Cleaning...";
+		socket.broadcast(message);
+		
 		boolean cleanResult = false;
 		getFilesUrl(request,response);
 		String currentDIR =  baseURL + "UploadFiles\\";//获得当前工程路径
@@ -66,9 +82,11 @@ public class DataCleanServlet extends HttpServlet {
 			System.out.println("创建目录失败！");
 		}
 		try {
-			startClean(rulesURL, datasetURL, request, response);
+			HashMap<Integer,String[]> dataSet = startClean(rulesURL, datasetURL, request, response, socket);
 			cleanResult = true;
 			request.setAttribute("cleanResult", cleanResult);
+			request.setAttribute("dataSet", dataSet);
+			request.setAttribute("header", header);
 			request.getRequestDispatcher("loadFile.jsp").forward(request,response);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -78,8 +96,8 @@ public class DataCleanServlet extends HttpServlet {
 		}
 	}
 	
-	public void startClean(String rulesFile, String dataURL, HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException{
-//		List<Integer> ignoredIDs = new ArrayList<Integer>();
+	public HashMap<Integer,String[]> startClean(String rulesFile, String dataURL, HttpServletRequest request, HttpServletResponse response, WebSocketTest socket) throws SQLException, IOException{
+		
 		double startTime = System.currentTimeMillis();    //获取开始时间
 		
 		Rule rule = new Rule();
@@ -147,16 +165,16 @@ public class DataCleanServlet extends HttpServlet {
 		HashMap<String, Double> attributesPROB = MLNmain.main(learnwt);	//入口：参数学习 weight learning——using 'Diagonal Newton discriminative learning'
 
 		//打印MLN marginal计算得到的概率
-		Iterator<Entry<String, Double>> iter = attributesPROB.entrySet().iterator(); 
-        while(iter.hasNext()){ 
-            Entry<String, Double> me = iter.next() ; 
-            System.out.println(me.getKey() + " --> " + me.getValue()) ; 
-        }
+//		Iterator<Entry<String, Double>> iter = attributesPROB.entrySet().iterator(); 
+//        while(iter.hasNext()){ 
+//            Entry<String, Double> me = iter.next() ; 
+//            System.out.println(me.getKey() + " --> " + me.getValue()) ; 
+//        }
         
         Domain domain = new Domain();
 		
 		domain.header = rule.header;
-        
+        header = rule.header;
         //区域划分 形成Domains
         domain.init(dataURL, splitString, ifHeader, rules);
         //对每个Domain执行group by key操作
@@ -166,27 +184,30 @@ public class DataCleanServlet extends HttpServlet {
         domain.correctByMLN(domain.Domain_to_Groups, attributesPROB, domain.header, domain.domains);
         
         //打印修正后的Domain
-        domain.printDomainContent(domain.domains);
+//        domain.printDomainContent(domain.domains);
         
         System.out.println(">>> Find Duplicate Values...");
+        socket.broadcast(">>> Find Duplicate Values...");
         
         List<List<Integer>> keysList = domain.combineDomain(domain.Domain_to_Groups); 	//返回所有重复数组的tupleID,并记录重复元组
         
         //打印重复数据的Tuple ID
-        System.out.println("\n\tDuplicate keys: ");
         if(null == keysList || keysList.isEmpty())System.out.println("\tNo duplicate exists.");
         else{
           	System.out.println("\n>>> Delete duplicate tuples");
+          	socket.sendMessage("\n>>> Delete duplicate tuples");
           	domain.deleteDuplicate(keysList, domain.dataSet);	//执行去重操作
           	System.out.println(">>> completed!");
+          	socket.sendMessage(">>> completed!");
         }
 //      	domain.printDataSet(domain.dataSet);
       	
 //      	domain.printConflicts(domain.conflicts);
       	
       	domain.findCandidate(domain.conflicts, domain.Domain_to_Groups, domain.domains, attributesPROB);
+      	
       	//print dataset after cleaning
-      	domain.printDataSet(domain.dataSet);
+//      	domain.printDataSet(domain.dataSet);
       	writeToFile(cleanedFileURL,domain.dataSet, domain.header);
       	double endTime = System.currentTimeMillis();    //获取结束时间
       	
@@ -194,6 +215,10 @@ public class DataCleanServlet extends HttpServlet {
       	DecimalFormat df = new DecimalFormat("#.00");
       	
       	System.out.println("程序运行时间： "+df.format(totalTime)+"s"); 
+      	socket.broadcast("程序运行时间： "+df.format(totalTime)+"s");
+      	
+      	HashMap<Integer,String[]> dataSet = domain.dataSet;
+      	return dataSet;
 	}
 	
 	//写文件
@@ -223,7 +248,6 @@ public class DataCleanServlet extends HttpServlet {
             while(iter.hasNext()){
             	Entry<Integer, String[]> entry = iter.next();
             	String line = Arrays.toString(entry.getValue()).replaceAll("[\\[\\]]","");
-            	System.out.println(line);
                 writer.write(line);
                 writer.newLine();//换行
             }

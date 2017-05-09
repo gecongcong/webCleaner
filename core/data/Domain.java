@@ -8,13 +8,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import com.sun.org.apache.xalan.internal.xsltc.runtime.Attributes;
-
 
 public class Domain {
 	
@@ -269,11 +265,11 @@ public class Domain {
 				Domain_to_Groups.add(groups);
 			}
 		}
-		int d_index=0;
-		for(List<HashMap<Integer, Tuple>> d: Domain_to_Groups){
-			System.out.println("\n*******Domain "+(++d_index)+"*******");
-			printGroup(d);
-		}
+//		int d_index=0;
+//		for(List<HashMap<Integer, Tuple>> d: Domain_to_Groups){
+//			System.out.println("\n*******Domain "+(++d_index)+"*******");
+//			printGroup(d);
+//		}
 //		printGroup(groups);
 	}
 	
@@ -323,12 +319,12 @@ public class Domain {
 		}
 		
 		//输出修正后的Group结果
-		System.out.println("\n=======After Correct Values By MLN Probability=======");
-		int d_index = 0;
-		for(List<HashMap<Integer, Tuple>> groups: Domain_to_Groups){
-			System.out.println("\n*******Domain "+(++d_index)+"*******");
-			printGroup(groups);
-		}
+//		System.out.println("\n=======After Correct Values By MLN Probability=======");
+//		int d_index = 0;
+//		for(List<HashMap<Integer, Tuple>> groups: Domain_to_Groups){
+//			System.out.println("\n*******Domain "+(++d_index)+"*******");
+//			printGroup(groups);
+//		}
 	}
 	
 	
@@ -338,22 +334,22 @@ public class Domain {
 	 * @param HashMap<Integer,String[]> dataSet
 	 * */
 	public void deleteDuplicate(List<List<Integer>> keyList_list, HashMap<Integer,String[]> dataSet){
-		System.out.println("\tDuplicate keys: ");
+//		System.out.println("\tDuplicate keys: ");
 		for(List<Integer> keyList: keyList_list){
 			if(keyList==null) continue;
 			for(int i=0;i<keyList.size()-1;i++){
 				int key1 = keyList.get(i);
 				String[] pre_tuple = dataSet.get(key1);
-				System.out.print("\tGROUP "+i+":"+key1+" ");
+//				System.out.print("\tGROUP "+i+":"+key1+" ");
 				for(int j=i+1;j<keyList.size();j++){
 					int key2 = keyList.get(j);
 					String[] curr_tuple = dataSet.get(key2);
 					if(Arrays.toString(pre_tuple).equals(Arrays.toString(curr_tuple))){
-						System.out.print(key2+" ");
+//						System.out.print(key2+" ");
 						dataSet.remove(key2);
 					}
 				}
-				System.out.println();
+//				System.out.println();
 			}
 		}
 	}
@@ -652,7 +648,6 @@ public class Domain {
 							while(iter.hasNext()){
 								Entry<Integer, Tuple> en = iter.next();
 								Tuple t = en.getValue();
-								System.out.println("for number = "+(test_i++));
 								if(ifContains(sameID, t.AttributeIndex) && ifSameValue(sameID, t, ct)){
 									flag[i] = true;
 									combinedTuple = combineTuple(combinedTuple, t, sameID);
@@ -777,11 +772,11 @@ public class Domain {
 		}
 		
 		//===========test==========
-		int d_index = 0;
-		for(List<HashMap<Integer, Tuple>> groups: Domain_to_Groups){
-			System.out.println("\n*******Domain "+(++d_index)+"*******");
+//		int d_index = 0;
+//		for(List<HashMap<Integer, Tuple>> groups: Domain_to_Groups){
+//			System.out.println("\n*******Domain "+(++d_index)+"*******");
 //			printGroup(groups);
-		}
+//		}
 		 //===========test==========
 		
 		System.out.println(">>> Fix the error values...");
