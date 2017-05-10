@@ -25,7 +25,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 public class UploadServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-	private String baseURL = "E:\\experiment\\";
+	private String baseURL = "D:\\experiment\\";
 	private String rulesURL = null;
 	private String datasetURL = null;
 	

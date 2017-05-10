@@ -1,57 +1,7 @@
 	
 	var websocket = new WebSocket("ws://localhost/Cleaner-web/webSocket");
 	
-	//发送消息
-	function send() {
-		var message = document.getElementById('rulesURL').value+","+document.getElementById('datasetURL').value;
-		websocket.send(message);
-	}
 	
-    //判断当前浏览器是否支持WebSocket
-    /*if ('WebSocket' in window) {
-        webSocket = new WebSocket("ws://localhost/Cleaner-web/webSocket");
-    }
-    else {
-        alert('当前浏览器 Not support websocket')
-    }*/
-	
-  //连接发生错误的回调方法
-	websocket.onerror = function () {
-		setMessageInnerHTML("WebSocket连接发生错误");
-	};
-	
-	//连接成功建立的回调方法
-	websocket.onopen = function () {
-		setMessageInnerHTML("This is RDBSCleaner V1.0");
-	}
-	
-	//接收到消息的回调方法
-	websocket.onmessage = function (event) {
-		setMessageInnerHTML(event.data);
-	}
-	
-	//连接关闭的回调方法
-	websocket.onclose = function () {
-		alert("websocket closed");
-		fieldset.fadeOut(300, function() {
-			form.next().fadeIn();
-    	});
-	}
-	
-	//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
-	window.onbeforeunload = function () {
-		closeWebSocket();
-	}
-	
-	//将消息显示在网页上
-	function setMessageInnerHTML(innerHTML) {
-		document.getElementById('message').innerHTML += innerHTML + '<br/>';
-	}
-	
-	//关闭WebSocket连接
-	function closeWebSocket() {
-		websocket.close();
-	}
 
 jQuery(document).ready(function() {
     /*
@@ -78,10 +28,6 @@ jQuery(document).ready(function() {
 	}else{
 		/* Form */
 		$('.registration-form fieldset:first-child').fadeIn('slow');
-    
-		$('.registration-form input[type="text"], .registration-form input[type="password"], .registration-form textarea').on('focus', function() {
-			$(this).removeClass('input-error');
-		});
 	}
     
     // previous step
@@ -105,6 +51,63 @@ jQuery(document).ready(function() {
     	});
     	
     });
+    
+  //发送消息
+	function send() {
+		var message = document.getElementById('rulesURL').value+","+document.getElementById('datasetURL').value;
+		websocket.send(message);
+	};
+	
+    //判断当前浏览器是否支持WebSocket
+    /*if ('WebSocket' in window) {
+        webSocket = new WebSocket("ws://localhost/Cleaner-web/webSocket");
+    }
+    else {
+        alert('当前浏览器 Not support websocket')
+    }*/
+	
+  //连接发生错误的回调方法
+	websocket.onerror = function () {
+		setMessageInnerHTML("WebSocket连接发生错误");
+	};
+	
+	//连接成功建立的回调方法
+	websocket.onopen = function () {
+		setMessageInnerHTML("This is RDBSCleaner V1.0");
+	};
+	
+	//接收到消息的回调方法
+	websocket.onmessage = function (event) {
+		setMessageInnerHTML(event.data);
+		if(event.data=="Finish."){
+			closeWebSocket();
+		}
+	};
+	
+	//连接关闭的回调方法
+	websocket.onclose = function () {
+		
+	};
+	
+	//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+	window.onbeforeunload = function () {
+		closeWebSocket();
+	};
+	
+	//将消息显示在网页上
+	function setMessageInnerHTML(innerHTML) {
+		document.getElementById('message').innerHTML += innerHTML + '<br/>';
+	};
+	
+	//关闭WebSocket连接
+	function closeWebSocket() {
+		websocket.close();
+		alert("the end");
+		window.location.href = "clean2.jsp";
+	};
+    
+    setTimeout(send(),1000);
+    
     
 });
 

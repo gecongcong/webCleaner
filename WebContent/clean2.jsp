@@ -23,7 +23,7 @@
 <%
 	boolean cleanResult = false;
 	if(request.getAttribute( "cleanResult")!=null){
-		cleanResult = (boolean)request.getAttribute( "cleanResult");
+		cleanResult = (boolean)session.getAttribute( "cleanResult");
 	}
 	String rulesURL = (String)request.getAttribute("rulesURL");
 	String datasetURL = (String)request.getAttribute("datasetURL");
@@ -110,10 +110,30 @@
 										           data-height="500"
 										           style="background:#fff;">
 												<thead>
-													<tr>
+													<tr style="background:#fff;">
+													<%	String[] header = (String[])session.getAttribute("header");
+														if(null!=header)
+														for(int i=0;i<header.length;i++){%>
+															<th><%=header[i]%></th>
+														<%}%>
+												    </tr>
 												</thead>
 											  	<tbody>
-											  	
+											  	<%
+											  	HashMap<Integer,String[]> dataSet = (HashMap<Integer,String[]>)session.getAttribute("dataSet");
+												if(null!=dataSet){
+													Iterator<Entry<Integer,String[]>> iter = dataSet.entrySet().iterator();%>
+													<%while(iter.hasNext()){
+														Entry<Integer,String[]> entry = iter.next();
+														String[] value = entry.getValue();%>
+														<tr>
+														<%for(int i=0;i<value.length;i++){%>
+															<td><%=value[i]%></td>
+														<%}%>
+														</tr>
+													<%}
+												}
+											  	%>
 											    </tbody>
 											</table>
 		                        		</div>
@@ -137,7 +157,7 @@
 		<script src="bootstrap-3.3.7/js/bootstrap.min.js"></script>
 		<script src="bootstrap-3.3.7/js/bootstrap-table.js"></script>
         <script src="assets/js/jquery.backstretch.min.js"></script>
-        <script src="assets/js/scripts2.js"></script>
+        <script src="assets/js/scripts3.js"></script>
         <!--FileInput组件-->
         <script src="bootstrap-fileinput-master/js/fileinput.js"></script>
 		<script src="bootstrap-fileinput-master/js/locales/zh.js"></script>

@@ -35,7 +35,7 @@ import util.GetHttpSessionConfigurator;
 @ServerEndpoint(value="/webSocket",configurator=GetHttpSessionConfigurator.class)
 public class CleanerSocketServer {
 	public String[] header = null;
-	private String baseURL = "E:\\experiment\\";
+	private String baseURL = "D:\\experiment\\";
 	private HttpSession httpSession;
 	
     @OnMessage
@@ -44,24 +44,31 @@ public class CleanerSocketServer {
     	boolean cleanResult = false;
         // Print the client message for testing purposes
         System.out.println("Received: " + message);
-        // Send the first message to the client
-        session.getBasicRemote().sendText(">>> Start Cleaning...");
         
-        String[] URLs = message.split(",");
-        String rulesURL = URLs[0];
-        String datasetURL = URLs[1];
-        try {
-			HashMap<Integer,String[]> dataSet = startClean(rulesURL, datasetURL, session);
-			cleanResult = true;
-			httpSession.setAttribute("cleanResult", cleanResult);
-			httpSession.setAttribute("header", header);
-			httpSession.setAttribute("dataSet", dataSet);
-			this.onClose();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+        if(!message.equals("undefined")){
+        	// Send the first message to the client
+            session.getBasicRemote().sendText(">>> Start Cleaning...");
+            
+            String[] URLs = message.split(",");
+            String rulesURL = URLs[0];
+            String datasetURL = URLs[1];
+            try {
+    			HashMap<Integer,String[]> dataSet = startClean(rulesURL, datasetURL, session);
+    			cleanResult = true;
+    			httpSession.setAttribute("cleanResult", cleanResult);
+    			httpSession.setAttribute("header", header);
+    			httpSession.setAttribute("dataSet", dataSet);
+    		} catch (SQLException e) {
+    			e.printStackTrace();
+    		}
+        }
+        
     }
 
+    public void close(){
+    	this.onClose();
+    }
+    
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) {
     	httpSession= (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
@@ -192,9 +199,9 @@ public HashMap<Integer,String[]> startClean(String rulesFile, String dataURL, Se
       	DecimalFormat df = new DecimalFormat("#.00");
       	
       	System.out.println("程序运行时间： "+df.format(totalTime)+"s");
-      	session.getBasicRemote().sendText(">>> Finished.");
-      	session.getBasicRemote().sendText("程序运行时间： "+df.format(totalTime)+"s");
       	
+      	session.getBasicRemote().sendText("程序运行时间： "+df.format(totalTime)+"s");
+      	session.getBasicRemote().sendText("Finish.");
       	HashMap<Integer,String[]> dataSet = domain.dataSet;
       	return dataSet;
 	}

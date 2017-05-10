@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="bootstrap-fileinput-master/css/fileinput.min.css">
 </head>
-<body style="font-family: 'Roboto';" onload="send()">
+<body style="font-family: 'Roboto';">
 <%
 	boolean cleanResult = false;
 	if(request.getAttribute( "cleanResult")!=null){
