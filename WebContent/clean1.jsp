@@ -18,16 +18,20 @@
     <!-- <link rel="stylesheet" href="assets/css/form-elements.css"> -->
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="bootstrap-fileinput-master/css/fileinput.min.css">
-    
 </head>
-<body style="font-family: 'Roboto';">
+<body style="font-family: 'Roboto';" onload="send()">
 <%
 	boolean cleanResult = false;
 	if(request.getAttribute( "cleanResult")!=null){
-		cleanResult = (boolean)request.getAttribute( "cleanResult");
+		cleanResult = (boolean)session.getAttribute( "cleanResult");
 	}
+	String rulesURL = (String)request.getAttribute("rulesURL");
+	String datasetURL = (String)request.getAttribute("datasetURL");
 %>
 <input type="text" id="cleanResult" style="display:none" value="<%=cleanResult%>"/>
+<input type="text" id="rulesURL" style="display:none" value="<%=rulesURL%>"/>
+<input type="text" id="datasetURL" style="display:none" value="<%=datasetURL%>"/>
+
 <nav class="navbar navbar-default" role="navigation">
 	<div class="container-fluid">
 		<div class="navbar-header">
@@ -84,32 +88,8 @@
                     <div class="row">
                         <div class="col-sm-12 form-box">
                         	
-                        	<form action="UploadServlet" id="uploadForm" role="form" method="post" enctype="multipart/form-data" class="registration-form" style="font-weight: 300;">
+                        	<form action="#" id="cleanForm" role="form" method="post" class="registration-form" style="font-weight: 300;">
                         		
-                        		<fieldset id="fieldset">
-		                        	<div class="form-top">
-		                        		<div class="form-top-left">
-		                        			<h3>Step 1 / 3</h3>
-		                            		<p>Load dirty dataSet and some constraint rules</p>
-		                        		</div>
-		                        		<div class="form-top-right">
-		                        			<i class="fa fa-cloud-upload"></i>
-		                        		</div>
-		                            </div>
-		                            <div class="form-bottom">
-				                    	<div class="form-group" id="loadFileForm">
-				                    		<p>Dirty dataSet</p>
-				                    		<input id="file-dataset" class="file" type="file" name="dataset">
-				                    		<br>
-				                    		<p>Rules</p>
-				                    		<input id="file-rules" class="file" type="file" name="rules">
-				                    		<br>
-				                    		<button type="button" class="btn btn-primary next" onclick="send()">Next</button>
-				                    	</div>
-				                        
-				                    </div>
-			                    </fieldset>
-			                    
 			                    <fieldset>
 		                        	<div class="form-top">
 		                        		<div class="form-top-left">
@@ -121,7 +101,10 @@
 		                        		</div>
 		                            </div>
 		                            <div class="form-bottom">
-		                            	<div id="message"></div>
+		                            	<div class="panel panel-default">
+		                            		<div id="message" style="margin:20px"></div>
+		                            	</div>
+		                            	<button type="button" id="startButton" style="display:none">start cleaning</button>
 				                    </div>
 			                    </fieldset>
 			                    
@@ -146,7 +129,7 @@
 										           style="background:#fff;">
 												<thead>
 													<tr style="background:#fff;">
-													<%	String[] header = (String[])request.getAttribute("header");
+													<%	String[] header = (String[])session.getAttribute("header");
 														if(null!=header)
 														for(int i=0;i<header.length;i++){%>
 															<th><%=header[i]%></th>
@@ -155,7 +138,7 @@
 												</thead>
 											  	<tbody>
 											  	<%
-											  	HashMap<Integer,String[]> dataSet = (HashMap<Integer,String[]>)request.getAttribute("dataSet");
+											  	HashMap<Integer,String[]> dataSet = (HashMap<Integer,String[]>)session.getAttribute("dataSet");
 												if(null!=dataSet){
 													Iterator<Entry<Integer,String[]>> iter = dataSet.entrySet().iterator();%>
 													<%while(iter.hasNext()){
@@ -192,7 +175,7 @@
 		<script src="bootstrap-3.3.7/js/bootstrap.min.js"></script>
 		<script src="bootstrap-3.3.7/js/bootstrap-table.js"></script>
         <script src="assets/js/jquery.backstretch.min.js"></script>
-        <script src="assets/js/scripts.js"></script>
+        <script src="assets/js/scripts2.js"></script>
         <!--FileInput组件-->
         <script src="bootstrap-fileinput-master/js/fileinput.js"></script>
 		<script src="bootstrap-fileinput-master/js/locales/zh.js"></script>
@@ -200,41 +183,6 @@
         <script src="bootstrap-3.3.7/js/jquery.base64.js"></script>
 		<script src="bootstrap-3.3.7/js/bootstrap-table.js"></script>
 		<script src="bootstrap-3.3.7/js/bootstrap-table-export.js"></script>
-        <script>
-        $("#file-dataset").fileinput({
-	        'allowedFileExtensions' : ['db','data', 'csv','txt'],
-	        uploadUrl: uploadUrl, //上传的地址
-	        maxFilesNum: 1,
-	    });
-        $("#file-rules").fileinput({
-	        'allowedFileExtensions' : ['db','data', 'csv','txt'],
-	        maxFilesNum: 1,
-	    });
-	    /* $("#file-rules").fileinput({
-	        uploadUrl: '#', // you must set a valid URL here else you will get an error
-	        allowedFileExtensions : ['jpeg', 'jpg', 'png','gif'],
-	        overwriteInitial: false,
-	        maxFileSize: 1000,
-	        maxFilesNum: 10,
-	        //allowedFileTypes: ['image', 'video', 'flash'],
-	        slugCallback: function(filename) {
-	            return filename.replace('(', '_').replace(']', '_');
-	        }
-		}); */
-		
-	    $(document).ready(function() {
-	        $("#test-upload").fileinput({
-	            'showPreview' : false,
-	            'allowedFileExtensions' : ['jpg', 'png','gif'],
-	            'elErrorContainer': '#errorBlock'
-	        });
-	        /*
-	        $("#test-upload").on('fileloaded', function(event, file, previewId, index) {
-	            alert('i = ' + index + ', id = ' + previewId + ', file = ' + file.name);
-	        });
-	        */
-	    });
-        </script>
 
 </div>
 </body>

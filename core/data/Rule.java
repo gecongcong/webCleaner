@@ -18,6 +18,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.websocket.Session;
+
 import java.util.*;
 import tuffy.util.Config;
 import org.postgresql.Driver;
@@ -150,13 +153,16 @@ public class Rule {
 	}
 	
 	/**
-	 * 娴犲窎ules娑擃厽褰侀崣鏉檙edicates
+	 * getting predicates
 	 * @param fileURL
 	 * @param splitString
 	 * @return List<String[]>
+	 * @throws IOException 
 	 * */
-	public List<Tuple> loadRules(String DBurl, String fileURL,String splitString){
+	public List<Tuple> loadRules(String DBurl, String fileURL,String splitString, Session session) throws IOException{
 		System.out.println(">>> Getting Predicates.......");
+		session.getBasicRemote().sendText(">>> Getting Predicates.......");
+		
 		FileReader reader;
 		String[] reason_predicates = null;
 		String[] result_predicates = null;
@@ -201,6 +207,7 @@ public class Rule {
 	        	if(current.equals(Arrays.toString(combine)))continue;
 	        	
 	        	System.out.println(Arrays.toString(combine));
+	        	session.getBasicRemote().sendText(Arrays.toString(combine));
 	        	
 	        	current = Arrays.toString(combine);
 	        	list.add(t);
@@ -213,18 +220,21 @@ public class Rule {
             e.printStackTrace();
 		}
 		System.out.println(">>> Completed!");
+		session.getBasicRemote().sendText(">>> Completed!");
 		return list;
 	}
 	
 	/**
 	 * 閺嶇厧绱￠崠鏍ㄦ殶閹诡噣娉﹂敍灞煎▏閸忓墎顑侀崥鍦N閻ㄥ嫯绶崗銉﹀闂囷拷
 	 * @param outFile
+	 * @throws IOException 
 	 */
-	public void formatEvidence(String outFile){
+	public void formatEvidence(String outFile, Session session) throws IOException{
 		String content = "";
 		//Clean all the out content in 'outFile'
         FileWriter fw;
         System.out.println(">> Write Evidence to file (evidence.db) ...");
+        session.getBasicRemote().sendText(">> Write Evidence to file (evidence.db) ...");
 		try {
 			fw = new FileWriter(outFile);
 			fw.write("");
@@ -276,6 +286,7 @@ public class Rule {
 		}
         writeToFile(content, outFile);
 		System.out.println(">> Writing Completed!");
+		session.getBasicRemote().sendText(">> Writing Completed!");
 
 		String url = Config.db_url;
 		String username = Config.db_username;

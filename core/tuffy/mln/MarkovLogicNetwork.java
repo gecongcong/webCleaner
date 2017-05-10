@@ -2,6 +2,7 @@ package tuffy.mln;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,6 +10,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.zip.GZIPInputStream;
+
+import javax.websocket.Session;
 
 import tuffy.db.RDB;
 import tuffy.parse.InputParser;
@@ -614,8 +617,9 @@ public class MarkovLogicNetwork implements Cloneable{
 	 * Parse multiple MLN program files.
 	 * 
 	 * @param progFiles list of MLN program files (in Alchemy format)
+	 * @throws IOException 
 	 */
-	public void loadPrograms(String[] progFiles){
+	public void loadPrograms(String[] progFiles, Session session) throws IOException{
 		for(String f : progFiles){
 			String g = FileMan.getGZIPVariant(f);
 			if(g == null){
@@ -624,6 +628,8 @@ public class MarkovLogicNetwork implements Cloneable{
 				f = g;
 			}
 			UIMan.println(">>> Parsing program file: " + f);
+			session.getBasicRemote().sendText(">>> Parsing program file: " + f);
+			
 			parser.parseProgramFile(f);
 		}
 		normalizeClauses();
@@ -648,8 +654,9 @@ public class MarkovLogicNetwork implements Cloneable{
 	 * incrementally parse this file. Can also accept .gz file (see {@link GZIPInputStream#GZIPInputStream(InputStream)}).
 	 * 
 	 * @param evidFiles list of MLN evidence files (in Alchemy format)
+	 * @throws IOException 
 	 */
-	public void loadEvidences(String[] evidFiles){
+	public void loadEvidences(String[] evidFiles, Session session) throws IOException{
 		int chunkSize = Config.evidence_file_chunk_size;
 		for(String f : evidFiles){
 			String g = FileMan.getGZIPVariant(f);
@@ -659,6 +666,7 @@ public class MarkovLogicNetwork implements Cloneable{
 				f = g;
 			}
 			UIMan.println(">>> Parsing evidence file: " + f);
+			session.getBasicRemote().sendText(">>> Parsing evidence file: " + f);
 			
 			if(FileMan.getFileSize(f) <= chunkSize){
 				parser.parseEvidenceFile(f);
@@ -703,8 +711,9 @@ public class MarkovLogicNetwork implements Cloneable{
 	 * Parse multiple MLN query files.
 	 * 
 	 * @param queryFiles list of MLN query files (in Alchemy format)
+	 * @throws IOException 
 	 */
-	public void loadQueries(String[] queryFiles){
+	public void loadQueries(String[] queryFiles, Session session) throws IOException{
 		for(String f : queryFiles){
 			String g = FileMan.getGZIPVariant(f);
 			if(g == null){
@@ -713,6 +722,8 @@ public class MarkovLogicNetwork implements Cloneable{
 				f = g;
 			}
 			UIMan.println(">>> Parsing query file: " + f);
+			session.getBasicRemote().sendText(">>> Parsing query file: " + f);
+			
 			parser.parseQueryFile(f);
 		}
 	}
@@ -756,11 +767,12 @@ public class MarkovLogicNetwork implements Cloneable{
 
 	/**
 	 * Stores constants and evidence into database table.
+	 * @throws IOException 
 	 * 
 	 * @see MarkovLogicNetwork#materializeAllTypes(RDB)
 	 * @see MarkovLogicNetwork#storeAllEvidence()
 	 */
-	public void materializeTables(){
+	public void materializeTables(Session session) throws IOException{
 		UIMan.verbose(1, ">>> Storing symbol tables...");
 		UIMan.verbose(1, "    constants = " + mapConstantID.size());
 		db.createConstantTable(mapConstantID, Config.relConstants);
@@ -774,6 +786,7 @@ public class MarkovLogicNetwork implements Cloneable{
 		}
 		materializeAllTypes(db);
 		UIMan.println(">>> Storing evidence...");
+		session.getBasicRemote().sendText(">>> Storing evidence...");
 		storeAllEvidence();
 	}
 

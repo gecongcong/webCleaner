@@ -1,11 +1,14 @@
 package tuffy.learn;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+
+import javax.websocket.Session;
 
 import tuffy.ground.partition.PartitionScheme;
 import tuffy.infer.InferPartitioned;
@@ -24,15 +27,15 @@ import tuffy.util.UIMan;
 
 public class SGDLearner extends Infer{
 
-	public void run(CommandOptions opt) throws SQLException{
+	public void run(CommandOptions opt, Session session) throws SQLException, IOException{
 		
 		UIMan.println(">>> Running SGD Learning.");
 		
 		Config.track_clause_provenance = true;
 		Config.learning_mode = true;
 		
-		setUp(opt);
-		ground();
+		setUp(opt,session);
+		ground(session);
 
 		if(options.maxFlips == 0){
 			options.maxFlips = 100 * grounding.getNumAtoms();
@@ -89,7 +92,7 @@ public class SGDLearner extends Infer{
 		UIMan.println(">>> Writing answer to file: " + options.fout);
 		this.dumpAnswers(weights, options.fout);
 				
-		cleanUp();
+		cleanUp(session);
 	}
 	
 	public void dumpAnswers(HashMap<String, Double> currentWeight, String fout){

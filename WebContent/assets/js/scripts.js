@@ -1,6 +1,5 @@
 
 jQuery(document).ready(function() {
-	
     /*
         Fullscreen background
     */
@@ -31,8 +30,7 @@ jQuery(document).ready(function() {
 		});
 	}
     
-    
-    // next step
+	// start cleaning
     $('.registration-form .btn-primary.next').on('click', function() {
     	var parent_fieldset = $(this).parents('fieldset');
     	var next_step = true;
@@ -73,6 +71,8 @@ jQuery(document).ready(function() {
     		$("#uploadForm").submit();
     	}
     });
+    
+    
     
     // previous step
     $('.registration-form .btn-primary.previous').on('click', function() {

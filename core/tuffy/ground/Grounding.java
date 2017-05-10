@@ -1,11 +1,14 @@
 package tuffy.ground;
 
 
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
+
+import javax.websocket.Session;
 
 import tuffy.db.RDB;
 import tuffy.db.SQLMan;
@@ -284,9 +287,11 @@ public class Grounding {
 	/**
 	 * Construct the MRF. First compute the closure of active atoms,
 	 * then active clauses.
+	 * @throws IOException 
 	 */
-	public void constructMRF(){
+	public void constructMRF(Session session) throws IOException{
 		UIMan.println(">>> Grounding...");
+		session.getBasicRemote().sendText(">>> Grounding...");
 		
 		UIMan.verbose(1, ">>> Computing closure of active atoms...");
 		String sql;
@@ -328,6 +333,7 @@ public class Grounding {
 		destroyActTables();
 		
 		UIMan.println("### atoms = " + UIMan.comma(numAtoms) + "; clauses = " + UIMan.comma(numClauses));
+		session.getBasicRemote().sendText("### atoms = " + UIMan.comma(numAtoms) + "; clauses = " + UIMan.comma(numClauses));
 	}
 
 	private int populateAtomTable(String relAtoms){

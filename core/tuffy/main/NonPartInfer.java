@@ -1,6 +1,9 @@
 package tuffy.main;
 
+import java.io.IOException;
 import java.util.ArrayList;
+
+import javax.websocket.Session;
 
 import tuffy.infer.MRF;
 import tuffy.parse.CommandOptions;
@@ -11,10 +14,10 @@ import tuffy.util.UIMan;
  * Non-parition-aware inference.
  */
 public class NonPartInfer extends Infer{
-	public void run(CommandOptions opt){
+	public void run(CommandOptions opt,Session session) throws IOException{
 		UIMan.println(">>> Running non-partition inference.");
-		setUp(opt);
-		ground();
+		setUp(opt,session);
+		ground(session);
 
 		if(options.maxFlips == 0){
 			options.maxFlips = 100 * grounding.getNumAtoms();
@@ -92,7 +95,7 @@ public class NonPartInfer extends Infer{
 			
 		}
 		
-		cleanUp();
+		cleanUp(session);
 	}
 
 }

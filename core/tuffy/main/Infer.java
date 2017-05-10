@@ -3,7 +3,10 @@ package tuffy.main;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
+
+import javax.websocket.Session;
 
 import tuffy.db.RDB;
 import tuffy.ground.Grounding;
@@ -47,10 +50,11 @@ public abstract class Infer {
 
 	/**
 	 * Ground the MLN into an MRF.
+	 * @throws IOException 
 	 */
-	protected void ground(){
+	protected void ground(Session session) throws IOException{
 		grounding = new Grounding(mln);
-		grounding.constructMRF();
+		grounding.constructMRF(session);
 	}
 
 	/**
@@ -63,8 +67,9 @@ public abstract class Infer {
 	 * 5) mark query atoms in the database {@link MarkovLogicNetwork#storeAllQueries()}.
 	 * 
 	 * @param opt command line options.
+	 * @throws IOException 
 	 */
-	protected void setUp(CommandOptions opt){
+	protected void setUp(CommandOptions opt, Session session) throws IOException{
 		options = opt;
 		Timer.resetClock();
 
@@ -72,14 +77,16 @@ public abstract class Infer {
 		Clause.mappingFromID2Desc = new HashMap<String, String>();
 		
 		UIMan.println(">>> Connecting to RDBMS at " + Config.db_url);
+		session.getBasicRemote().sendText(">>> Connecting to RDBMS at " + Config.db_url);
+		
 		db = RDB.getRDBbyConfig();
 		
 		db.resetSchema(Config.db_schema);
 
 		mln = new MarkovLogicNetwork();
-		loadMLN(mln, db, options);
+		loadMLN(mln, db, options, session);
 
-		mln.materializeTables();
+		mln.materializeTables(session);
 		
 		KBMC kbmc = new KBMC(mln);
 		kbmc.run();
@@ -112,22 +119,26 @@ public abstract class Infer {
 	
 	/**
 	 * Clean up temporary data: the schema in PostgreSQL and the working directory.
+	 * @throws IOException 
 	 */
-	protected void cleanUp(){		
+	protected void cleanUp(Session session) throws IOException{		
 		Config.exiting_mode = true;
 		UIMan.println(">>> Cleaning up temporary data");
+		session.getBasicRemote().sendText(">>> Cleaning up temporary data");
 		if(!Config.keep_db_data){
 			UIMan.print("    Removing database schema '" + Config.db_schema + "'...");
 			UIMan.println(db.dropSchema(Config.db_schema)?"OK" : "FAILED");
 		}else{
-			UIMan.println("    Data remains in schema '" + Config.db_schema + "'.");
+			UIMan.println("\tData remains in schema '" + Config.db_schema + "'.");
+			session.getBasicRemote().sendText("    Data remains in schema '" + Config.db_schema + "'.");
 		}
 		db.close();
 
-		UIMan.print("    Removing temporary dir '" + Config.getWorkingDir() + "'...");
+		UIMan.print("\tRemoving temporary dir '" + Config.getWorkingDir() + "'...");
 		UIMan.println(FileMan.removeDirectory(new File(Config.getWorkingDir()))?"OK" : "FAILED");
 
 		UIMan.println("*** Tuffy exited at " + Timer.getDateTime() + " after running for " + Timer.elapsed());
+		session.getBasicRemote().sendText("*** Tuffy exited at " + Timer.getDateTime() + " after running for " + Timer.elapsed());
 		UIMan.closeDribbleFile();
 	}
 	
@@ -144,15 +155,16 @@ public abstract class Infer {
 	 * @param mln the target MLN
 	 * @param adb database object used for this MLN
 	 * @param opt command line options
+	 * @throws IOException 
 	 */
-	protected void loadMLN(MarkovLogicNetwork mln, RDB adb, CommandOptions opt){
+	protected void loadMLN(MarkovLogicNetwork mln, RDB adb, CommandOptions opt, Session session) throws IOException{
 		
 		String[] progFiles = opt.fprog.split(",");
-		mln.loadPrograms(progFiles);
+		mln.loadPrograms(progFiles, session);
 
 		if(opt.fquery != null){
 			String[] queryFiles = opt.fquery.split(",");
-			mln.loadQueries(queryFiles);
+			mln.loadQueries(queryFiles, session);
 		}
 		
 		if(opt.queryAtoms != null){
@@ -177,7 +189,7 @@ public abstract class Infer {
 		
 		if(opt.fevid != null){
 			String[] evidFiles = opt.fevid.split(",");
-			mln.loadEvidences(evidFiles);
+			mln.loadEvidences(evidFiles, session);
 		}
 		
 		dmover = new DataMover(mln);

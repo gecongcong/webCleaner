@@ -1,6 +1,9 @@
 package tuffy.main;
 
+import java.io.IOException;
 import java.util.HashMap;
+
+import javax.websocket.Session;
 
 import tuffy.ground.partition.PartitionScheme;
 import tuffy.infer.InferPartitioned;
@@ -15,16 +18,17 @@ import tuffy.util.UIMan;
  */
 public class PartInfer extends Infer{
 
-	public HashMap<String, Double> run(CommandOptions opt){
+	public HashMap<String, Double> run(CommandOptions opt, Session session) throws IOException{
 		UIMan.println(">>> Running partition-aware inference.");
+		session.getBasicRemote().sendText(">>> Running partition-aware inference.");
 		
 		
 		HashMap<String, Double> attributes = new HashMap<String, Double>();
 		
 		
-		setUp(opt);
+		setUp(opt,session);
 
-		ground();
+		ground(session);
 		
 		InferPartitioned ip = new InferPartitioned(grounding, dmover);
 		
@@ -100,21 +104,13 @@ public class PartInfer extends Infer{
 			attributes = dmover.dumpProbsToFile(mln.relAtoms, mfout);
 		}
 
-		
 		if(Config.sampleLog != null){
 			Config.sampleLog.close();
-			
 			String mfout = options.fout;
 			dmover.dumpSampleLog(mfout + ".log");
-			
-			
-			
 		}
 		
-		
-		
-		
-		cleanUp();
+		cleanUp(session);
 		return attributes;
 	}
 

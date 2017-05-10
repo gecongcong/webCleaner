@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 
+import javax.websocket.Session;
+
 import tuffy.learn.DNLearner;
 import tuffy.learn.MultiCoreSGDLearner;
 import tuffy.parse.CommandOptions;
@@ -14,7 +16,7 @@ import tuffy.util.UIMan;
  */
 public class MLNmain {
 	
-	public static HashMap<String, Double> main(String[] args) throws SQLException, IOException {
+	public static HashMap<String, Double> main(String[] args, Session session) throws SQLException, IOException {
 		
 		HashMap<String, Double> attributes = new HashMap<String, Double>();
 		//BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -29,6 +31,7 @@ public class MLNmain {
 		CommandOptions options = UIMan.parseCommand(args);
 		
 		UIMan.println("+++++++++ This is " + Config.product_name + "! +++++++++");
+		session.getBasicRemote().sendText("+++++++++ This is " + Config.product_name + "! +++++++++");
 		if(options == null){
 			return null;
 		}
@@ -37,10 +40,10 @@ public class MLNmain {
 			// INFERENCE
 			if(!options.disablePartition){
 				
-				attributes = new PartInfer().run(options);
+				attributes = new PartInfer().run(options, session);
 			}else{
 				
-				new NonPartInfer().run(options);
+				new NonPartInfer().run(options,session);
 				
 			}
 		}else{
@@ -48,13 +51,13 @@ public class MLNmain {
 			if(options.mle){
 				//SGDLearner l = new SGDLearner();
 				MultiCoreSGDLearner l = new MultiCoreSGDLearner();
-				l.run(options);
-				l.cleanUp();
+				l.run(options,session);
+				l.cleanUp(session);
 				
 			}else{
 				//LEARNING
 				DNLearner l = new DNLearner();
-				l.run(options);
+				l.run(options,session);
 			}
 		}
 		return attributes;

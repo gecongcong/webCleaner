@@ -1,5 +1,6 @@
 package tuffy.learn;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
@@ -11,6 +12,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.websocket.Session;
 
 import tuffy.ground.partition.Bucket;
 import tuffy.ground.partition.Component;
@@ -376,7 +379,7 @@ public class MultiCoreSGDLearner extends Infer{
 		
 	}
 
-	public void run(CommandOptions opt) throws SQLException{
+	public void run(CommandOptions opt,Session session) throws SQLException, IOException{
 		
 		UIMan.println(">>> Running partition-aware MLE Learning.");
 		
@@ -385,8 +388,8 @@ public class MultiCoreSGDLearner extends Infer{
 		Config.track_clause_provenance = true;
 		Config.learning_mode = true;
 		
-		setUp(opt);
-		ground();
+		setUp(opt,session);
+		ground(session);
 		
 		ip = new InferPartitioned(grounding, dmover);
 		
@@ -414,7 +417,7 @@ public class MultiCoreSGDLearner extends Infer{
 		
 	}
 	
-	public void run_noSetup(CommandOptions opt) throws SQLException{
+	public void run_noSetup(CommandOptions opt, Session session) throws SQLException, IOException{
 		
 		UIMan.println(">>> Running partition-aware MLE Learning.");
 		
@@ -424,7 +427,7 @@ public class MultiCoreSGDLearner extends Infer{
 		Config.learning_mode = true;
 		
 		setUp_noloading(opt);
-		ground();
+		ground(session);
 		
 		ip = new InferPartitioned(grounding, dmover);
 		

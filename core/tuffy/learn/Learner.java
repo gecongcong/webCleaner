@@ -1,11 +1,14 @@
 package tuffy.learn;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+
+import javax.websocket.Session;
 
 import tuffy.infer.MRF;
 import tuffy.main.Infer;
@@ -125,17 +128,18 @@ public abstract class Learner extends Infer {
 	 * run the learner
 	 * @param opt Command line Options
 	 * @throws SQLException 
+	 * @throws IOException 
 	 */
 	@SuppressWarnings("unchecked")
-	public void run(CommandOptions opt) throws SQLException{
+	public void run(CommandOptions opt, Session session) throws SQLException, IOException{
 		// tally clause
 		Config.learning_mode = true;
 		Config.stop_samplesat_upon_sat = true;
 		Config.track_clause_provenance = true;
 		
 		UIMan.println(">>> Learning clause weight with MC-SAT.");
-		setUp(opt);
-		ground();
+		setUp(opt,session);
+		ground(session);
 		
 		Timer.runStat.markGroundingDone();
 
@@ -283,7 +287,7 @@ public abstract class Learner extends Infer {
 		UIMan.println(">>> Writing answer to file: " + options.fout);
 		this.dumpAnswers(options.fout);
 		
-		cleanUp();		
+		cleanUp(session);		
 	}	
 	
 	/**
