@@ -1,10 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import=
-	"java.util.HashMap,
-	java.util.Iterator,
-	java.util.List,
-	java.util.Map,
-	java.util.Map.Entry" %>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -21,13 +16,6 @@
     
 </head>
 <body style="font-family: 'Roboto';">
-<%
-	boolean cleanResult = false;
-	if(request.getAttribute( "cleanResult")!=null){
-		cleanResult = (boolean)request.getAttribute( "cleanResult");
-	}
-%>
-<input type="text" id="cleanResult" style="display:none" value="<%=cleanResult%>"/>
 <nav class="navbar navbar-default" role="navigation">
 	<div class="container-fluid">
 		<div class="navbar-header">
@@ -104,79 +92,8 @@
 				                    		<p>Rules</p>
 				                    		<input id="file-rules" class="file" type="file" name="rules">
 				                    		<br>
-				                    		<button type="button" class="btn btn-primary next" onclick="send()">Next</button>
+				                    		<button type="button" class="btn btn-primary next">Next</button>
 				                    	</div>
-				                        
-				                    </div>
-			                    </fieldset>
-			                    
-			                    <fieldset>
-		                        	<div class="form-top">
-		                        		<div class="form-top-left">
-		                        			<h3>Step 2 / 3</h3>
-		                            		<p>Start Cleaning...</p>
-		                        		</div>
-		                        		<div class="form-top-right">
-		                        			<i class="fa fa-key"></i>
-		                        		</div>
-		                            </div>
-		                            <div class="form-bottom">
-		                            	<div id="message"></div>
-				                    </div>
-			                    </fieldset>
-			                    
-			                    <fieldset>
-		                        	<div class="form-top">
-		                        		<div class="form-top-left">
-		                        			<h3>Step 3 / 3</h3>
-		                            		<p>Cleaning finished!</p>
-		                        		</div>
-		                        		<div class="form-top-right">
-		                        			<!-- <i class="fa fa-key"></i> -->
-		                        		</div>
-		                        		<div>
-			                        		<table id="table"
-										           data-toggle="table"
-										           data-show-columns="true"
-										           data-search="true"
-										           data-show-refresh="true"
-										           data-show-toggle="true"
-										           data-pagination="true"
-										           data-height="500"
-										           style="background:#fff;">
-												<thead>
-													<tr style="background:#fff;">
-													<%	String[] header = (String[])request.getAttribute("header");
-														if(null!=header)
-														for(int i=0;i<header.length;i++){%>
-															<th><%=header[i]%></th>
-														<%}%>
-												    </tr>
-												</thead>
-											  	<tbody>
-											  	<%
-											  	HashMap<Integer,String[]> dataSet = (HashMap<Integer,String[]>)request.getAttribute("dataSet");
-												if(null!=dataSet){
-													Iterator<Entry<Integer,String[]>> iter = dataSet.entrySet().iterator();%>
-													<%while(iter.hasNext()){
-														Entry<Integer,String[]> entry = iter.next();
-														String[] value = entry.getValue();%>
-														<tr>
-														<%for(int i=0;i<value.length;i++){%>
-															<td><%=value[i]%></td>
-														<%}%>
-														</tr>
-													<%}
-												}
-											  	%>
-											    </tbody>
-											</table>
-		                        		</div>
-		                            </div>
-		                            
-		                            <div class="form-bottom">
-				                        <button type="button" class="btn btn-primary previous">Restart</button>
-				                        <button type="button" class="btn btn-success submit">Download</button>
 				                    </div>
 			                    </fieldset>
 		                    </form>
@@ -210,30 +127,7 @@
 	        'allowedFileExtensions' : ['db','data', 'csv','txt'],
 	        maxFilesNum: 1,
 	    });
-	    /* $("#file-rules").fileinput({
-	        uploadUrl: '#', // you must set a valid URL here else you will get an error
-	        allowedFileExtensions : ['jpeg', 'jpg', 'png','gif'],
-	        overwriteInitial: false,
-	        maxFileSize: 1000,
-	        maxFilesNum: 10,
-	        //allowedFileTypes: ['image', 'video', 'flash'],
-	        slugCallback: function(filename) {
-	            return filename.replace('(', '_').replace(']', '_');
-	        }
-		}); */
-		
-	    $(document).ready(function() {
-	        $("#test-upload").fileinput({
-	            'showPreview' : false,
-	            'allowedFileExtensions' : ['jpg', 'png','gif'],
-	            'elErrorContainer': '#errorBlock'
-	        });
-	        /*
-	        $("#test-upload").on('fileloaded', function(event, file, previewId, index) {
-	            alert('i = ' + index + ', id = ' + previewId + ', file = ' + file.name);
-	        });
-	        */
-	    });
+	   
         </script>
 
 </div>

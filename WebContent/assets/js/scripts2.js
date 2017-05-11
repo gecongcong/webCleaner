@@ -51,12 +51,6 @@ jQuery(document).ready(function() {
     	});
     	
     });
-    
-  //发送消息
-	function send() {
-		var message = document.getElementById('rulesURL').value+","+document.getElementById('datasetURL').value;
-		websocket.send(message);
-	};
 	
     //判断当前浏览器是否支持WebSocket
     /*if ('WebSocket' in window) {
@@ -102,12 +96,21 @@ jQuery(document).ready(function() {
 	//关闭WebSocket连接
 	function closeWebSocket() {
 		websocket.close();
-		alert("the end");
-		window.location.href = "clean2.jsp";
+		$('#viewResult').show();
 	};
     
-    setTimeout(send(),1000);
-    
-    
+	//发送消息
+	function send() {
+		var message = document.getElementById('rulesURL').value+","+document.getElementById('datasetURL').value;
+		if(websocket!=null){
+			websocket.send(message);
+		}else{
+			setTimeout( function(){},1000);
+			websocket.send(message);
+		}
+		
+	};
+	
+	send();
 });
 

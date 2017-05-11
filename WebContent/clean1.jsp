@@ -17,18 +17,14 @@
     <link rel="stylesheet" href="bootstrap-3.3.7/css/bootstrap-table.min.css">
     <!-- <link rel="stylesheet" href="assets/css/form-elements.css"> -->
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/loading.css">
     <link rel="stylesheet" href="bootstrap-fileinput-master/css/fileinput.min.css">
 </head>
 <body style="font-family: 'Roboto';">
 <%
-	boolean cleanResult = false;
-	if(request.getAttribute( "cleanResult")!=null){
-		cleanResult = (boolean)session.getAttribute( "cleanResult");
-	}
 	String rulesURL = (String)request.getAttribute("rulesURL");
 	String datasetURL = (String)request.getAttribute("datasetURL");
 %>
-<input type="text" id="cleanResult" style="display:none" value="<%=cleanResult%>"/>
 <input type="text" id="rulesURL" style="display:none" value="<%=rulesURL%>"/>
 <input type="text" id="datasetURL" style="display:none" value="<%=datasetURL%>"/>
 
@@ -97,71 +93,28 @@
 		                            		<p>Start Cleaning...</p>
 		                        		</div>
 		                        		<div class="form-top-right">
-		                        			<i class="fa fa-key"></i>
+		                        			<!-- <i class="fa fa-spinner"></i> -->
+		                        			<div id="loading">
+											<div id="loading-center">
+											<div id="loading-center-absolute">
+											<div class="object" id="object_four"></div>
+											<div class="object" id="object_three"></div>
+											<div class="object" id="object_two"></div>
+											<div class="object" id="object_one"></div>
+											</div>
+											</div>
+											</div>
 		                        		</div>
 		                            </div>
 		                            <div class="form-bottom">
 		                            	<div class="panel panel-default">
-		                            		<div id="message" style="margin:20px"></div>
+		                            		<div id="message" style="margin:30px;height:500px;overflow:auto"></div>
+		                            		<button type="button" id="viewResult" style="display:none;margin-top:15px" onClick="window.location.href='clean2.jsp'" class="btn btn-success pull-right">View Result</button>
 		                            	</div>
-		                            	<button type="button" id="startButton" style="display:none">start cleaning</button>
+		                            	<br>
 				                    </div>
 			                    </fieldset>
 			                    
-			                    <fieldset>
-		                        	<div class="form-top">
-		                        		<div class="form-top-left">
-		                        			<h3>Step 3 / 3</h3>
-		                            		<p>Cleaning finished!</p>
-		                        		</div>
-		                        		<div class="form-top-right">
-		                        			<!-- <i class="fa fa-key"></i> -->
-		                        		</div>
-		                        		<div>
-			                        		<table id="table"
-										           data-toggle="table"
-										           data-show-columns="true"
-										           data-search="true"
-										           data-show-refresh="true"
-										           data-show-toggle="true"
-										           data-pagination="true"
-										           data-height="500"
-										           style="background:#fff;">
-												<thead>
-													<tr style="background:#fff;">
-													<%	String[] header = (String[])session.getAttribute("header");
-														if(null!=header)
-														for(int i=0;i<header.length;i++){%>
-															<th><%=header[i]%></th>
-														<%}%>
-												    </tr>
-												</thead>
-											  	<tbody>
-											  	<%
-											  	HashMap<Integer,String[]> dataSet = (HashMap<Integer,String[]>)session.getAttribute("dataSet");
-												if(null!=dataSet){
-													Iterator<Entry<Integer,String[]>> iter = dataSet.entrySet().iterator();%>
-													<%while(iter.hasNext()){
-														Entry<Integer,String[]> entry = iter.next();
-														String[] value = entry.getValue();%>
-														<tr>
-														<%for(int i=0;i<value.length;i++){%>
-															<td><%=value[i]%></td>
-														<%}%>
-														</tr>
-													<%}
-												}
-											  	%>
-											    </tbody>
-											</table>
-		                        		</div>
-		                            </div>
-		                            
-		                            <div class="form-bottom">
-				                        <button type="button" class="btn btn-primary previous">Restart</button>
-				                        <button type="button" class="btn btn-success submit">Download</button>
-				                    </div>
-			                    </fieldset>
 		                    </form>
 		                    
                         </div>

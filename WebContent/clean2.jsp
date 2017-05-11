@@ -21,17 +21,8 @@
 </head>
 <body style="font-family: 'Roboto';" onload="send()">
 <%
-	boolean cleanResult = false;
-	if(request.getAttribute( "cleanResult")!=null){
-		cleanResult = (boolean)session.getAttribute( "cleanResult");
-	}
-	String rulesURL = (String)request.getAttribute("rulesURL");
-	String datasetURL = (String)request.getAttribute("datasetURL");
+	String cleanedFileURL = (String)session.getAttribute("cleanedFileURL");
 %>
-<input type="text" id="cleanResult" style="display:none" value="<%=cleanResult%>"/>
-<input type="text" id="rulesURL" style="display:none" value="<%=rulesURL%>"/>
-<input type="text" id="datasetURL" style="display:none" value="<%=datasetURL%>"/>
-
 <nav class="navbar navbar-default" role="navigation">
 	<div class="container-fluid">
 		<div class="navbar-header">
@@ -140,8 +131,8 @@
 		                            </div>
 		                            
 		                            <div class="form-bottom">
-				                        <button type="button" class="btn btn-primary previous">Restart</button>
-				                        <button type="button" class="btn btn-success submit">Download</button>
+				                        <button type="button" class="btn btn-primary previous" onClick="window.location.href='loadFile.jsp'">Restart</button>
+				                        <button type="button" class="btn btn-success submit" onClick="window.location.href='/Cleaner-web/cleanedDataSet.txt'">Download</button>
 				                    </div>
 			                    </fieldset>
 		                    </form>
@@ -165,7 +156,18 @@
         <script src="bootstrap-3.3.7/js/jquery.base64.js"></script>
 		<script src="bootstrap-3.3.7/js/bootstrap-table.js"></script>
 		<script src="bootstrap-3.3.7/js/bootstrap-table-export.js"></script>
-
+		<script>
+		function downloadFile(url) {   
+	        try{ 
+	            var elemIF = document.createElement("iframe");   
+	            elemIF.src = url;   
+	            elemIF.style.display = "none";   
+	            document.body.appendChild(elemIF);   
+	        }catch(e){ 
+	 
+	        } 
+	    }
+		</script>
 </div>
 </body>
 </html>

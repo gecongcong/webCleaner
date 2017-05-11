@@ -35,8 +35,9 @@ import util.GetHttpSessionConfigurator;
 @ServerEndpoint(value="/webSocket",configurator=GetHttpSessionConfigurator.class)
 public class CleanerSocketServer {
 	public String[] header = null;
-	private String baseURL = "D:\\experiment\\";
+	private String baseURL = "E:\\experiment\\";
 	private HttpSession httpSession;
+	private String cleanedFileURL = null;
 	
     @OnMessage
     public void onMessage(String message, Session session, EndpointConfig config) throws IOException, InterruptedException {
@@ -58,6 +59,7 @@ public class CleanerSocketServer {
     			httpSession.setAttribute("cleanResult", cleanResult);
     			httpSession.setAttribute("header", header);
     			httpSession.setAttribute("dataSet", dataSet);
+    			httpSession.setAttribute("cleanedFileURL", cleanedFileURL);
     		} catch (SQLException e) {
     			e.printStackTrace();
     		}
@@ -86,7 +88,9 @@ public HashMap<Integer,String[]> startClean(String rulesFile, String dataURL, Se
 		
 		Rule rule = new Rule();
 		String evidence_outFile = baseURL + "dataSet\\HAI\\evidence.db";
-		String cleanedFileURL = baseURL+ "cleanedDataSet.txt";//存放清洗后的数据集
+		String rootURL = httpSession.getServletContext().getRealPath("WEB-INF/out");
+		System.out.println("rootURL"+rootURL);
+		cleanedFileURL = rootURL+ "\\cleanedDataSet.txt";//存放清洗后的数据集
 		
 		String splitString = ",";
 		boolean ifHeader = true;
@@ -193,6 +197,7 @@ public HashMap<Integer,String[]> startClean(String rulesFile, String dataURL, Se
       	//print dataset after cleaning
 //      	domain.printDataSet(domain.dataSet);
       	writeToFile(cleanedFileURL,domain.dataSet, domain.header);
+      	cleanedFileURL = httpSession.getServletContext().getContextPath()+ "\\cleanedDataSet.txt";//修改为相对路径;
       	double endTime = System.currentTimeMillis();    //获取结束时间
       	
       	double totalTime= (endTime-startTime)/1000;
@@ -210,9 +215,8 @@ public HashMap<Integer,String[]> startClean(String rulesFile, String dataURL, Se
 	public void writeToFile(String cleanedFileURL, HashMap<Integer, String[]> dataSet, String[] header){
 		File file = new File(cleanedFileURL);
 		FileWriter fw = null;
-      BufferedWriter writer = null;
+		BufferedWriter writer = null;
       try {
-          fw = new FileWriter(file);
           if (file.exists()) {// 判断文件是否存在
   			System.out.println("文件已存在: " + cleanedFileURL);
   		}
@@ -226,6 +230,7 @@ public HashMap<Integer,String[]> startClean(String rulesFile, String dataURL, Se
           else{
           	file.createNewFile();
           }
+          fw = new FileWriter(file);
           writer = new BufferedWriter(fw);
           Iterator<Entry<Integer, String[]>> iter = dataSet.entrySet().iterator();
           writer.write(Arrays.toString(header).replaceAll("[\\[\\]]",""));
