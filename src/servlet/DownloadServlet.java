@@ -32,7 +32,7 @@ public class DownloadServlet extends HttpServlet {
         //获得请求文件名  
         String fileURL = (String) request.getSession().getAttribute("cleanedFileURL");
         System.out.println("url = "+fileURL);  
-        String filename = "out.txt";
+        String filename = "RDBSCleaner_cleaned.txt";
         //设置文件MIME类型  
         response.setContentType(getServletContext().getMimeType(filename));  
         //设置Content-Disposition  

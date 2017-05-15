@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
+
 public class Domain {
 	
 	public HashMap<Integer,String[]> dataSet = new HashMap<Integer,String[]>();
@@ -183,7 +185,8 @@ public class Domain {
 			map.put(bigIDs[i], 1);
 		}
 		int i = 0;
-		for(;IDs[i]!=-1;i++){
+		
+		for(;i<IDs.length && IDs[i]!=-1;i++){
 			Integer value = map.get(IDs[i]);
 			if(null!=value){
 				count++;
@@ -373,7 +376,7 @@ public class Domain {
 	 * */
 	public Tuple combineTuple (Tuple t1 , Tuple t2, int[] sameID){
 		Tuple t = new Tuple();
-		if(sameID.length==0){ //不存在相同的属性
+		if(sameID.length==0 || (sameID.length>0 && sameID[0]== -1)){ //不存在相同的属性
 			int[] attributeIndex = concat(t1.getAttributeIndex(), t2.getAttributeIndex());
 			String[] TupleContext = concat(t1.getContext(), t2.getContext());
 
@@ -614,7 +617,7 @@ public class Domain {
 	/**
 	 * 为冲突元组找到候选的替换方案
 	 * */
-	public void findCandidate(HashMap<Integer,Conflicts> conflicts , List<List<HashMap<Integer, Tuple>>> Domain_to_Groups, List<HashMap<Integer, Tuple>> domains, HashMap<String, Double> attributesPROB){
+	public void findCandidate(HashMap<Integer,Conflicts> conflicts , List<List<HashMap<Integer, Tuple>>> Domain_to_Groups, List<HashMap<Integer, Tuple>> domains, HashMap<String, Double> attributesPROB, ArrayList<Integer> ignoredIDs){
 		
 		Tuple candidateTuple = new Tuple();
 		
@@ -640,14 +643,22 @@ public class Domain {
 					int[] sameID = findSameID(firstTuple.AttributeIndex, combinedTuple.AttributeIndex);
 					if(sameID[0]!=-1){
 						List<HashMap<Integer, Tuple>> cur_groups = Domain_to_Groups.get(i);
+//						int for_i = 0;
 						for(HashMap<Integer, Tuple> group: cur_groups){
 							Iterator<Entry<Integer, Tuple>> iter = group.entrySet().iterator();
 							
-							int test_i = 0;
-							
+//							int test_i = 0;
+//							System.err.println("iterator i = "+for_i++);
+//							if(for_i==21){
+//								System.out.println("debug here");
+//							}
 							while(iter.hasNext()){
 								Entry<Integer, Tuple> en = iter.next();
 								Tuple t = en.getValue();
+//								System.err.println("test i = "+test_i++);
+//								if(test_i==40){
+//									System.out.println("debug here");
+//								}
 								if(ifContains(sameID, t.AttributeIndex) && ifSameValue(sameID, t, ct)){
 									flag[i] = true;
 									combinedTuple = combineTuple(combinedTuple, t, sameID);
@@ -702,9 +713,27 @@ public class Domain {
 	            }
 			}
 			//修改dataset中这一条的数据
-			dataSet.put(tupleID, candidateTuple.TupleContext);
+			String[] ignoredValues = new String[ignoredIDs.size()];
+			for(int i=0;i<ignoredIDs.size();i++){
+				ignoredValues[i] = dataSet.get(tupleID)[ignoredIDs.get(i)];
+			}
+			String[] newTupleContext = new String[header.length];
+			for(int i=0;i<header.length;i++){
+				for(int j=0;j<ignoredIDs.size();j++){
+					if(i==ignoredIDs.get(j)){
+						newTupleContext[i] = ignoredValues[j];
+					}
+				}
+				for(int k=0;k<candidateTuple.AttributeIndex.length;k++){
+					if(i==candidateTuple.AttributeIndex[k]){
+						newTupleContext[i] = candidateTuple.TupleContext[k];
+					}
+				}
+			}
+//			String[] newTupleContext = concat(ignoredValues, candidateTuple.TupleContext);
+			dataSet.put(tupleID, newTupleContext);
+			System.out.println("\ntupleID = ["+tupleID+"] candidate Tuple = "+Arrays.toString(newTupleContext));
 		}
-		System.out.println("\ncandidate Tuple = "+Arrays.toString(candidateTuple.TupleContext));
 		
 	}
 	

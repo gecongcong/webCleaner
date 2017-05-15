@@ -38,6 +38,7 @@ public class CleanerSocketServer {
 	private String baseURL = "E:\\experiment\\";
 	private HttpSession httpSession;
 	private String cleanedFileURL = null;
+	private ArrayList<Integer> ignoredIDs = null;
 	
     @OnMessage
     public void onMessage(String message, Session session, EndpointConfig config) throws IOException, InterruptedException {
@@ -51,8 +52,10 @@ public class CleanerSocketServer {
             session.getBasicRemote().sendText(">>> Start Cleaning...");
             
             String[] URLs = message.split(",");
-            String rulesURL = URLs[0];
-            String datasetURL = URLs[1];
+//            String rulesURL = URLs[0];
+//            String datasetURL = URLs[1];
+            String rulesURL = "E:\\experiment\\dataSet\\HAI\\rules.txt";
+            String datasetURL = "E:\\experiment\\dataSet\\HAI\\HAI-11q-10%-error.csv";
             try {
     			HashMap<Integer,String[]> dataSet = startClean(rulesURL, datasetURL, session);
     			cleanResult = true;
@@ -90,8 +93,8 @@ public HashMap<Integer,String[]> startClean(String rulesFile, String dataURL, Se
 		String evidence_outFile = baseURL + "dataSet\\HAI\\evidence.db";
 		String rootURL = httpSession.getServletContext().getRealPath("out");
 		System.out.println("rootURL"+rootURL);
-		cleanedFileURL = rootURL+ "\\cleanedDataSet.data";//存放清洗后的数据集
-		
+		cleanedFileURL = rootURL+ "\\RDBSCleaner_cleaned.txt";//存放清洗后的数据集
+		System.out.println("dataURL = "+dataURL);
 		String splitString = ",";
 		boolean ifHeader = true;
 		
@@ -101,7 +104,7 @@ public HashMap<Integer,String[]> startClean(String rulesFile, String dataURL, Se
 		
 		rule.formatEvidence(evidence_outFile, session);
 		
-//		ignoredIDs = rule.findIgnoredTuples(rules);
+		ignoredIDs = rule.findIgnoredTuples(rules);
 		
 		//调用MLN相关的命令参数
 		ArrayList<String> list = new ArrayList<String>();
@@ -184,7 +187,7 @@ public HashMap<Integer,String[]> startClean(String rulesFile, String dataURL, Se
         else{
           	System.out.println("\n>>> Delete duplicate tuples");
           	session.getBasicRemote().sendText("\n>>> Delete duplicate tuples");
-          	domain.deleteDuplicate(keysList, domain.dataSet);	//执行去重操作
+//          	domain.deleteDuplicate(keysList, domain.dataSet);	//执行去重操作
           	System.out.println(">>> completed!");
           	session.getBasicRemote().sendText(">>> completed!");
         }
@@ -192,7 +195,7 @@ public HashMap<Integer,String[]> startClean(String rulesFile, String dataURL, Se
       	
 //      	domain.printConflicts(domain.conflicts);
       	
-      	domain.findCandidate(domain.conflicts, domain.Domain_to_Groups, domain.domains, attributesPROB);
+      	domain.findCandidate(domain.conflicts, domain.Domain_to_Groups, domain.domains, attributesPROB, ignoredIDs);
       	
       	//print dataset after cleaning
 //      	domain.printDataSet(domain.dataSet);
