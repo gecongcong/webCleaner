@@ -88,9 +88,9 @@ public HashMap<Integer,String[]> startClean(String rulesFile, String dataURL, Se
 		
 		Rule rule = new Rule();
 		String evidence_outFile = baseURL + "dataSet\\HAI\\evidence.db";
-		String rootURL = httpSession.getServletContext().getRealPath("WEB-INF/out");
+		String rootURL = httpSession.getServletContext().getRealPath("out");
 		System.out.println("rootURL"+rootURL);
-		cleanedFileURL = rootURL+ "\\cleanedDataSet.txt";//存放清洗后的数据集
+		cleanedFileURL = rootURL+ "\\cleanedDataSet.data";//存放清洗后的数据集
 		
 		String splitString = ",";
 		boolean ifHeader = true;
@@ -197,7 +197,8 @@ public HashMap<Integer,String[]> startClean(String rulesFile, String dataURL, Se
       	//print dataset after cleaning
 //      	domain.printDataSet(domain.dataSet);
       	writeToFile(cleanedFileURL,domain.dataSet, domain.header);
-      	cleanedFileURL = httpSession.getServletContext().getContextPath()+ "\\cleanedDataSet.txt";//修改为相对路径;
+//      	cleanedFileURL = httpSession.getServletContext().getContextPath()+ "/out/cleanedDataSet.data";//修改为相对路径;
+      	System.out.println("cleanedDataSet.txt stored in="+cleanedFileURL);
       	double endTime = System.currentTimeMillis();    //获取结束时间
       	
       	double totalTime= (endTime-startTime)/1000;

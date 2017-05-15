@@ -132,7 +132,7 @@
 		                            
 		                            <div class="form-bottom">
 				                        <button type="button" class="btn btn-primary previous" onClick="window.location.href='loadFile.jsp'">Restart</button>
-				                        <button type="button" class="btn btn-success submit" onClick="window.location.href='/Cleaner-web/cleanedDataSet.txt'">Download</button>
+				                        <button type="button" class="btn btn-success submit" onClick="window.location.href='ServletDownload'">Download</button>
 				                    </div>
 			                    </fieldset>
 		                    </form>
