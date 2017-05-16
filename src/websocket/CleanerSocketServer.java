@@ -52,10 +52,10 @@ public class CleanerSocketServer {
             session.getBasicRemote().sendText(">>> Start Cleaning...");
             
             String[] URLs = message.split(",");
-//            String rulesURL = URLs[0];
-//            String datasetURL = URLs[1];
-            String rulesURL = "E:\\experiment\\dataSet\\HAI\\rules.txt";
-            String datasetURL = "E:\\experiment\\dataSet\\HAI\\HAI-11q-10%-error.csv";
+            String rulesURL = URLs[0];
+            String datasetURL = URLs[1];
+            //String rulesURL = "E:\\experiment\\dataSet\\HAI\\rules.txt";
+            //String datasetURL = "E:\\experiment\\dataSet\\HAI\\HAI-11q-10%-error.csv";
             try {
     			HashMap<Integer,String[]> dataSet = startClean(rulesURL, datasetURL, session);
     			cleanResult = true;
