@@ -395,15 +395,28 @@ public class Domain {
 			String[] t2context = t2.getContext();
 			String[] TupleContext = Arrays.copyOf(t1context, attributeIndex.length);
 			int k = t1IDs.length;
-			
 			for(int i=0; i<t2IDs.length; i++){
-				for(int ID: sameID){
-					if(ID==-1)break;//初始化为-1，即已遍历完有值的部分
-					if(t2IDs[i]==ID)continue;
-					attributeIndex[k] = t2IDs[i];
-					TupleContext[k++] = t2context[i];
+				boolean flag = false;
+				for(int j=0;j<t1IDs.length;j++){
+					if(t2IDs[i]==t1IDs[j]){
+						flag = true;
+						break;
+					}
 				}
+				if(flag)continue;
+				attributeIndex[k] = t2IDs[i];
+				TupleContext[k] = t2context[i];
+				k++;
 			}
+			
+//			for(int i=0; i<t2IDs.length; i++){
+//				for(int ID: sameID){
+//					if(ID==-1)break;//初始化为-1，即已遍历完有值的部分
+//					if(t2IDs[i]==ID)continue;
+//					attributeIndex[k] = t2IDs[i];
+//					TupleContext[k++] = t2context[i];
+//				}
+//			}
 			t.setContext(TupleContext);
 			t.setAttributeIndex(attributeIndex);
 		}
@@ -628,7 +641,6 @@ public class Domain {
 			int tupleID = entry.getKey();
 			Conflicts conf= entry.getValue();
 			List<ConflictTuple> list = conf.tuples;
-			
 			for(ConflictTuple ct: list){
 				int[] conflictIDs = ct.conflictIDs;
 				int conflictDomainID = ct.domainID;
@@ -637,31 +649,27 @@ public class Domain {
 				Tuple combinedTuple = ct;
 				//去匹配下一个区域的元组值
 				for(int i=0; i<length; i++){
+					
 					if(flag[i] || i == conflictDomainID )continue;
 					HashMap<Integer, Tuple> domain = domains.get(i);
 					Tuple firstTuple = domain.entrySet().iterator().next().getValue();
 					int[] sameID = findSameID(firstTuple.AttributeIndex, combinedTuple.AttributeIndex);
 					if(sameID[0]!=-1){
 						List<HashMap<Integer, Tuple>> cur_groups = Domain_to_Groups.get(i);
-//						int for_i = 0;
 						for(HashMap<Integer, Tuple> group: cur_groups){
 							Iterator<Entry<Integer, Tuple>> iter = group.entrySet().iterator();
-							
-//							int test_i = 0;
-//							System.err.println("iterator i = "+for_i++);
-//							if(for_i==21){
-//								System.out.println("debug here");
-//							}
 							while(iter.hasNext()){
 								Entry<Integer, Tuple> en = iter.next();
 								Tuple t = en.getValue();
-//								System.err.println("test i = "+test_i++);
-//								if(test_i==40){
-//									System.out.println("debug here");
-//								}
 								if(ifContains(sameID, t.AttributeIndex) && ifSameValue(sameID, t, ct)){
 									flag[i] = true;
 									combinedTuple = combineTuple(combinedTuple, t, sameID);
+									System.err.println("1.combinedTuple = "+Arrays.toString(combinedTuple.TupleContext));
+									for(int a=0;a<combinedTuple.TupleContext.length;a++){
+										if(combinedTuple.TupleContext[a]==null){
+											System.err.println("debug here 1");
+										}
+									}
 									break;
 								}
 							}
@@ -669,6 +677,12 @@ public class Domain {
 						}
 					}else{
 						combinedTuple = combineTuple(combinedTuple, domain.get(tupleID), sameID);
+						System.err.println("2.combinedTuple = "+Arrays.toString(combinedTuple.TupleContext));
+						for(int a=0;a<combinedTuple.TupleContext.length;a++){
+							if(combinedTuple.TupleContext[a]==null){
+								System.err.println("debug here 2");
+							}
+						}
 						flag[i] = true;
 					}
 					
@@ -678,6 +692,7 @@ public class Domain {
 					if(flag[fi] || fi == conflictDomainID)continue;
 					HashMap<Integer, Tuple> domain = domains.get(fi);
 					Tuple firstTuple = domain.entrySet().iterator().next().getValue();
+					
 					int[] sameID = findSameID(firstTuple.AttributeIndex, combinedTuple.AttributeIndex);
 					if(sameID[0]!=-1){
 						Iterator<Entry<Integer, Tuple>> iter = domain.entrySet().iterator();
@@ -687,16 +702,29 @@ public class Domain {
 							if(ifContains(sameID, t.AttributeIndex) && ifSameValue(sameID, t, ct)){
 								flag[fi] = true;
 								combinedTuple = combineTuple(combinedTuple, t, sameID);
+								System.err.println("3.combinedTuple = "+Arrays.toString(combinedTuple.TupleContext));
+								for(int a=0;a<combinedTuple.TupleContext.length;a++){
+									if(combinedTuple.TupleContext[a]==null){
+										System.err.println("debug here 3");
+									}
+								}
 								break;
 							}
 						}
 						if(flag[fi])break;
 					}else{
 						combinedTuple = combineTuple(combinedTuple, domain.get(tupleID), sameID);
+						System.err.println("4.combinedTuple = "+Arrays.toString(combinedTuple.TupleContext));
+						for(int a=0;a<combinedTuple.TupleContext.length;a++){
+							if(combinedTuple.TupleContext[a]==null){
+								System.err.println("debug here 4");
+							}
+						}
 						flag[fi] = true;
 					}
 					
 				}
+				
 				String[] content = combinedTuple.TupleContext;
 	            int[] contentID = combinedTuple.AttributeIndex;
 	            double prob = 1.0;
@@ -713,15 +741,21 @@ public class Domain {
 	            }
 			}
 			//修改dataset中这一条的数据
-			String[] ignoredValues = new String[ignoredIDs.size()];
-			for(int i=0;i<ignoredIDs.size();i++){
-				ignoredValues[i] = dataSet.get(tupleID)[ignoredIDs.get(i)];
+			String[] ignoredValues = null;
+			if(ignoredIDs.size()>0){
+				ignoredValues = new String[ignoredIDs.size()];
+				for(int i=0;i<ignoredIDs.size();i++){
+					ignoredValues[i] = dataSet.get(tupleID)[ignoredIDs.get(i)];
+				}
 			}
+			
 			String[] newTupleContext = new String[header.length];
 			for(int i=0;i<header.length;i++){
-				for(int j=0;j<ignoredIDs.size();j++){
-					if(i==ignoredIDs.get(j)){
-						newTupleContext[i] = ignoredValues[j];
+				if(ignoredIDs.size()>0){
+					for(int j=0;j<ignoredIDs.size();j++){
+						if(i==ignoredIDs.get(j)){
+							newTupleContext[i] = ignoredValues[j];
+						}
 					}
 				}
 				for(int k=0;k<candidateTuple.AttributeIndex.length;k++){
@@ -730,7 +764,12 @@ public class Domain {
 					}
 				}
 			}
-//			String[] newTupleContext = concat(ignoredValues, candidateTuple.TupleContext);
+			String[] old_tuple = dataSet.get(tupleID);
+			for(int index = 0;index<newTupleContext.length;index++){
+				if(null==newTupleContext[index]){
+					newTupleContext[index] = old_tuple[index];
+				}
+			}
 			dataSet.put(tupleID, newTupleContext);
 			System.out.println("\ntupleID = ["+tupleID+"] candidate Tuple = "+Arrays.toString(newTupleContext));
 		}

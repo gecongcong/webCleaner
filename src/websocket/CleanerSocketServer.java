@@ -90,7 +90,7 @@ public HashMap<Integer,String[]> startClean(String rulesFile, String dataURL, Se
 		double startTime = System.currentTimeMillis();    //获取开始时间
 		
 		Rule rule = new Rule();
-		String evidence_outFile = baseURL + "dataSet\\HAI\\evidence.db";
+		String evidence_outFile = baseURL + "dataSet\\test\\evidence.db";
 		String rootURL = httpSession.getServletContext().getRealPath("out");
 		System.out.println("rootURL"+rootURL);
 		cleanedFileURL = rootURL+ "\\RDBSCleaner_cleaned.txt";//存放清洗后的数据集
@@ -120,25 +120,25 @@ public HashMap<Integer,String[]> startClean(String rulesFile, String dataURL, Se
 		String mln_args = "-i";
 		list.add(mln_args);
 		
-		String mlnFileURL = baseURL+"dataSet\\HAI\\prog.mln";//prog.mln
+		String mlnFileURL = baseURL+"dataSet\\test\\prog.mln";//prog.mln
 		list.add(mlnFileURL);
 		
 		String evidence_args = "-e";
 		list.add(evidence_args);
 		
-		String evidenceFileURL = baseURL+"dataSet\\HAI\\evidence.db"; //samples/smoke/
+		String evidenceFileURL = baseURL+"dataSet\\test\\evidence.db"; //samples/smoke/
 		list.add(evidenceFileURL);
 		
 		String queryFile_args = "-queryFile";
 		list.add(queryFile_args);
 		
-		String queryFileURL = baseURL+"dataSet\\HAI\\query.db";
+		String queryFileURL = baseURL+"dataSet\\test\\query.db";
 		list.add(queryFileURL);
 		
 		String outFile_args = "-r";
 		list.add(outFile_args);
 		
-		String weightFileURL = baseURL+"dataSet\\HAI\\out.txt";
+		String weightFileURL = baseURL+"dataSet\\test\\out.txt";
 		list.add(weightFileURL);
 		
 		String noDropDB = "-keepData";
