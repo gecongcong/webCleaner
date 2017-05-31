@@ -168,7 +168,7 @@ public class Domain {
 	        }
 	        br.close();
 	        reader.close();
-//	        printDomainContent(domains);
+	        printDomainContent(domains);
 	        
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -268,12 +268,11 @@ public class Domain {
 				Domain_to_Groups.add(groups);
 			}
 		}
-//		int d_index=0;
-//		for(List<HashMap<Integer, Tuple>> d: Domain_to_Groups){
-//			System.out.println("\n*******Domain "+(++d_index)+"*******");
-//			printGroup(d);
-//		}
-//		printGroup(groups);
+		int d_index=0;
+		for(List<HashMap<Integer, Tuple>> d: Domain_to_Groups){
+			System.out.println("\n*******Domain "+(++d_index)+"*******");
+			printGroup(d);
+		}
 	}
 	
 	/**
