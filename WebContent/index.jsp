@@ -21,7 +21,7 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="#">RDBSCleaner</a>
+			<a class="navbar-brand" href="index.jsp">RDBSCleaner</a>
 		</div>
 		
 		<div class="collapse navbar-collapse" id="navbar-collapse" style="font-size: 16px;font-weight: 300;">
@@ -32,7 +32,7 @@
 	                </a>
 	                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
 						<li role="presentation">
-							<a role="menuitem" tabindex="-1" href="#">Rules</a>
+							<a role="menuitem" tabindex="-1" href="RulesDescription.jsp">Rules</a>
 						</li>
 						<li role="presentation">
 							<a role="menuitem" tabindex="-1" href="#">DataSet</a>
@@ -70,7 +70,7 @@
 				Sample Data
 			</h2>
 			<p>
-				You are welcome to try out the software with your own datasets. Just use a comma-separated file. You can also <a href="#">get some sample data</a> to operate on.
+				You are welcome to try out the software with your own datasets. Just use a comma-separated file. You can also <a href="DownloadSamples">get some sample data</a> to operate on.
 			</p>
 		</div>
 		<div class="col-md-4 column">

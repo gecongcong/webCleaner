@@ -35,7 +35,7 @@ import util.GetHttpSessionConfigurator;
 @ServerEndpoint(value="/webSocket",configurator=GetHttpSessionConfigurator.class)
 public class CleanerSocketServer {
 	public String[] header = null;
-	private String baseURL = "E:\\experiment\\";
+	public static String baseURL = "E:\\experiment\\";
 	private HttpSession httpSession;
 	private String cleanedFileURL = null;
 	private ArrayList<Integer> ignoredIDs = null;
