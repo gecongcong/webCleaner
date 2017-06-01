@@ -15,7 +15,13 @@
     <link rel="stylesheet" href="bootstrap-fileinput-master/css/fileinput.min.css">
     
 </head>
-<body style="font-family: 'Roboto';">
+<body style="font-family: 'Roboto';" onload="load()">
+<%
+	String rulesURL = (String)request.getAttribute("rulesURL");
+	String datasetURL = (String)request.getAttribute("datasetURL");
+%>
+<input type="hidden" value="<%=request.getAttribute("rulesURL")%>" id="rule"/>
+
 <nav class="navbar navbar-default" role="navigation">
 	<div class="container-fluid">
 		<div class="navbar-header">
@@ -72,38 +78,59 @@
                     <div class="row">
                         <div class="col-sm-12 form-box">
                         	
-                        	<form action="UploadServlet" id="uploadForm" role="form" method="post" enctype="multipart/form-data" class="registration-form" style="font-weight: 300;">
+                        	<form action="UploadFileForDR" id="uploadForm" role="form" method="post" enctype="multipart/form-data" class="registration-form" style="font-weight: 300;">
                         		
                         		<fieldset id="fieldset">
 		                        	<div class="form-top">
 		                        		<div class="form-top-left">
-		                        			<h3>Step 1 / 3</h3>
-		                            		<p>Load dirty dataSet and some constraint rules</p>
+		                        			<h3>Discover Rules</h3>
+		                            		<p>Please load dirty dataSet</p>
 		                        		</div>
 		                        		<div class="form-top-right">
-		                        			<i class="fa fa-cloud-upload"></i>
+		                        			<i class="fa fa-search"></i>
 		                        		</div>
 		                            </div>
 		                            <div class="form-bottom">
 				                    	<div class="form-group" id="loadFileForm">
-				                    		<p>Dirty dataSet</p>
+				                    		<p>DataSet</p>
 				                    		<input id="file-dataset" class="file" type="file" name="dataset">
 				                    		<br>
-				                    		<p>Rules</p>
-				                    		<input id="file-rules" class="file" type="file" name="rules">
-				                    		<br>
-				                    		<button type="button" class="btn btn-primary next">Next</button>
-				                    		<a href="DiscoverRules.jsp">&nbsp;&nbsp;&nbsp;No rules?</a>
+				                    		<button type="button" class="btn btn-primary next">Start</button>
 				                    	</div>
 				                    </div>
 			                    </fieldset>
 		                    </form>
-		                    
                         </div>
                     </div>
                 </div>
 </div>
-
+<!-- 按钮触发模态框 -->
+<button style="display:none" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal" id="rulesResult"></button>
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title" id="myModalLabel">
+					模态框（Modal）标题
+				</h4>
+			</div>
+			<div class="modal-body">
+				在这里添加一些文本
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+				</button>
+				<button type="button" class="btn btn-primary">
+					提交更改
+				</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal -->
+</div>
 
         <!-- Javascript -->
         <script src="jquery-3.2.1/jquery-3.2.1.js"></script>
@@ -129,8 +156,14 @@
 	        maxFilesNum: 1,
 	    });
 	   
+        function load(){
+        	  //下面两种方法效果是一样的
+        	  var a = document.getElementById('rule').value;
+        	  if(a!="null"){
+        		  $('#myModal').modal();
+        	  }
+        	}
         </script>
-
 </div>
 </body>
 </html>
