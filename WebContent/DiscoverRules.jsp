@@ -16,11 +16,7 @@
     
 </head>
 <body style="font-family: 'Roboto';" onload="load()">
-<%
-	String rulesURL = (String)request.getAttribute("rulesURL");
-	String datasetURL = (String)request.getAttribute("datasetURL");
-%>
-<input type="hidden" value="<%=request.getAttribute("rulesURL")%>" id="rule"/>
+<input type="hidden" value="<%=session.getAttribute("rulesURL")%>" id="rule"/>
 
 <nav class="navbar navbar-default" role="navigation">
 	<div class="container-fluid">
@@ -91,11 +87,12 @@
 		                        		</div>
 		                            </div>
 		                            <div class="form-bottom">
-				                    	<div class="form-group" id="loadFileForm">
+				                    	<div class="form-group" id="loadFileForm" style="background:#fff;padding:25px;border-radius: 6px;">
 				                    		<p>DataSet</p>
 				                    		<input id="file-dataset" class="file" type="file" name="dataset">
 				                    		<br>
 				                    		<button type="button" class="btn btn-primary next">Start</button>
+				                    		<button type="button" class="btn btn-default next" onClick="window.location.href='loadFile.jsp'">Back</button>
 				                    	</div>
 				                    </div>
 			                    </fieldset>
@@ -107,7 +104,7 @@
 <!-- 按钮触发模态框 -->
 <button style="display:none" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal" id="rulesResult"></button>
 <!-- 模态框（Modal） -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="myModal" style="margin-top:200px" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -115,17 +112,18 @@
 					&times;
 				</button>
 				<h4 class="modal-title" id="myModalLabel">
-					模态框（Modal）标题
+					Result
 				</h4>
 			</div>
 			<div class="modal-body">
-				在这里添加一些文本
+				The data quality rules is generated.<br>
+				You could download this file to see more details.
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close
 				</button>
-				<button type="button" class="btn btn-primary">
-					提交更改
+				<button type="button" class="btn btn-success" onClick="window.location.href='DownloadRules'">
+					Download
 				</button>
 			</div>
 		</div><!-- /.modal-content -->
@@ -147,15 +145,47 @@
 		<script src="bootstrap-3.3.7/js/bootstrap-table-export.js"></script>
         <script>
         $("#file-dataset").fileinput({
-	        'allowedFileExtensions' : ['db','data', 'csv','txt'],
-	        uploadUrl: uploadUrl, //上传的地址
+        	uploadUrl: '#', // you must set a valid URL here else you will get an error
+        	'allowedFileExtensions' : ['db','data', 'csv','txt'],
+	        overwriteInitial: false,
+	        maxFileSize: 4096,
 	        maxFilesNum: 1,
-	    });
-        $("#file-rules").fileinput({
-	        'allowedFileExtensions' : ['db','data', 'csv','txt'],
-	        maxFilesNum: 1,
+	        slugCallback: function(filename) {
+	            return filename.replace('(', '_').replace(']', '_');
+	        }
 	    });
 	   
+        $("#file-3").fileinput({
+			showUpload: false,
+			showCaption: false,
+			browseClass: "btn btn-primary btn-lg",
+			fileType: "any",
+	        previewFileIcon: "<i class='glyphicon glyphicon-king'></i>"
+		}); 
+        
+        $("#file-1").fileinput({
+	        uploadUrl: '#', // you must set a valid URL here else you will get an error
+	        allowedFileExtensions : ['jpg', 'png','gif'],
+	        overwriteInitial: false,
+	        maxFileSize: 1000,
+	        maxFilesNum: 10,
+	        //allowedFileTypes: ['image', 'video', 'flash'],
+	        slugCallback: function(filename) {
+	            return filename.replace('(', '_').replace(']', '_');
+	        }
+		});
+	            
+		$("#file-3").fileinput({
+			showUpload: false,
+			showCaption: false,
+			browseClass: "btn btn-primary btn-lg",
+			fileType: "any",
+	        previewFileIcon: "<i class='glyphicon glyphicon-king'></i>"
+		});
+		$("#file-4").fileinput({
+			uploadExtraData: {kvId: '10'}
+		});
+        
         function load(){
         	  //下面两种方法效果是一样的
         	  var a = document.getElementById('rule').value;

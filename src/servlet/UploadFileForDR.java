@@ -12,6 +12,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -57,8 +58,9 @@ public class UploadFileForDR extends HttpServlet {
 			System.out.println("´´½¨Ä¿Â¼Ê§°Ü£¡");
 		}
 		String rulesURL = new DiscoverRules().start(datasetURL);
-		request.setAttribute("datasetURL", datasetURL);
-		request.setAttribute("rulesURL", rulesURL);
+		HttpSession session = request.getSession();
+		session.setAttribute("datasetURL", datasetURL);
+		session.setAttribute("rulesURL", rulesURL);
 		request.getRequestDispatcher("DiscoverRules.jsp").forward(request,response);
 	}
 	

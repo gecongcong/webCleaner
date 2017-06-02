@@ -1,12 +1,13 @@
 	
 	var websocket = new WebSocket("ws://localhost/Cleaner-web/webSocket");
 	
-	
 
 jQuery(document).ready(function() {
     /*
         Fullscreen background
     */
+	setTimeout( function(){},1000);
+	
     $.backstretch("images/background.jpg");
     
     $('#top-navbar-1').on('shown.bs.collapse', function(){
@@ -53,12 +54,12 @@ jQuery(document).ready(function() {
     });
 	
     //判断当前浏览器是否支持WebSocket
-    /*if ('WebSocket' in window) {
-        webSocket = new WebSocket("ws://localhost/Cleaner-web/webSocket");
-    }
-    else {
-        alert('当前浏览器 Not support websocket')
-    }*/
+//    if ('WebSocket' in window) {
+//        webSocket = new WebSocket("ws://localhost/Cleaner-web/webSocket");
+//    }
+//    else {
+//        alert('当前浏览器 Not support websocket')
+//    }
 	
   //连接发生错误的回调方法
 	websocket.onerror = function () {
