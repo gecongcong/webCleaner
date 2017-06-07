@@ -216,7 +216,7 @@ public class Rule {
 	}
 
 	public void addRule(String q[], List<String> p, String a, ArrayList<String> ans, String ans2) {// q£ºÌõ¼şÊôĞÔ
-		String rule = "1	" + q[0] + "(" + ans.get(0) + ")";
+		String rule = q[0] + "(" + ans.get(0) + ")";
 		for (int i = 1; i < q.length; i++) {
 			rule += " , " + q[i] + "(" + ans.get(i) + ")";
 		}
@@ -234,7 +234,7 @@ public class Rule {
 	}
 
 	public void addFD(String q[], String a) {
-		String rule = "1	" + q[0] + "(value"+q[0]+")";
+		String rule = q[0] + "(value"+q[0]+")";
 		for (int i = 1; i < q.length; i++) {
 			rule += " , " + q[i] + "(value"+q[i]+")";
 		}

@@ -85,11 +85,12 @@ public class CleanerSocketServer {
         System.out.println("cleaning finished!\nconnection closed");
     }
     
-public HashMap<Integer,String[]> startClean(String rulesFile, String dataURL, Session session) throws SQLException, IOException{
+public HashMap<Integer,String[]> startClean(String rulesURL, String dataURL, Session session) throws SQLException, IOException{
 		
 		double startTime = System.currentTimeMillis();    //获取开始时间
 		
 		Rule rule = new Rule();
+		Domain domain = new Domain();
 		String evidence_outFile = baseURL + "dataSet\\HAI\\evidence.db";
 		String rootURL = httpSession.getServletContext().getRealPath("out");
 		System.out.println("rootURL"+rootURL);
@@ -98,13 +99,19 @@ public HashMap<Integer,String[]> startClean(String rulesFile, String dataURL, Se
 		String splitString = ",";
 		boolean ifHeader = true;
 		
-		List<Tuple> rules = rule.loadRules(dataURL, rulesFile, splitString, session);
+		List<Tuple> rules = rule.loadRules(dataURL, rulesURL, splitString, session);
 		
 		rule.initData(dataURL, splitString, ifHeader);
 		
 		rule.formatEvidence(evidence_outFile, session);
 		
 		ignoredIDs = rule.findIgnoredTuples(rules);
+		
+		domain.header = rule.header;
+		
+        header = rule.header;
+        
+		domain.createMLN(rule.header, rulesURL);
 		
 		//调用MLN相关的命令参数
 		ArrayList<String> list = new ArrayList<String>();
@@ -161,11 +168,7 @@ public HashMap<Integer,String[]> startClean(String rulesFile, String dataURL, Se
 //            Entry<String, Double> me = iter.next() ; 
 //            System.out.println(me.getKey() + " --> " + me.getValue()) ; 
 //        }
-        
-        Domain domain = new Domain();
 		
-		domain.header = rule.header;
-        header = rule.header;
         //区域划分 形成Domains
         domain.init(dataURL, splitString, ifHeader, rules);
         //对每个Domain执行group by key操作

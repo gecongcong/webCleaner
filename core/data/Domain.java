@@ -1,8 +1,10 @@
 package data;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,6 +17,7 @@ import java.util.Map.Entry;
 import jdk.nashorn.internal.ir.annotations.Ignore;
 
 public class Domain {
+	public static String baseURL = "E:\\experiment\\";
 	
 	public HashMap<Integer,String[]> dataSet = new HashMap<Integer,String[]>();
 //	public List<String[]> dataSet = new ArrayList<String[]>();
@@ -28,6 +31,47 @@ public class Domain {
 	public String[] header = null; 
 	
 	public Domain(){}
+	
+	public void createMLN(String[] header, String rulesURL){
+		File file = new File(rulesURL);
+        BufferedReader reader = null;
+        ArrayList<String> lines = new ArrayList<String>();
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            String line = null;
+            while ((line = reader.readLine()) != null && line.length()!=0) {
+            	lines.add(line);
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e1) {
+                }
+            }
+        }
+		
+		String mlnURL = baseURL+"dataSet\\HAI\\prog.mln";//prog.mln;
+		String content = null;
+		try {
+            //打开一个写文件器，构造函数中的第二个参数true表示以追加形式写文件
+            FileWriter writer = new FileWriter(mlnURL, false);
+            for(int i=0;i<header.length;i++){
+            	content = header[i]+"(value"+header[i]+")\n";
+            	writer.write(content);
+            }
+            writer.write("\n");
+            for(int i=0;i<lines.size();i++){
+            	writer.write("1\t"+lines.get(i)+"\n");
+            }
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+	}
 	
 	/**
 	 * 按rules对数据集进行纵向划分 Partition DataSet into Domains
